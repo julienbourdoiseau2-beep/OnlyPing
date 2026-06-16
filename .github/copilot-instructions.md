@@ -1,0 +1,5 @@
+- Projet: OnlyPing, marketplace de videos techniques de ping-pong.
+- Stack: Next.js App Router, TypeScript, Prisma SQLite, NextAuth Credentials.
+- Langue interface: francais.
+- Priorite UX: experience premium, claire, responsive.
+- Role coach: gestion du catalogue dans espace protege.

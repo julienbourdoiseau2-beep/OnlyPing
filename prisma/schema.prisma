@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  avatarUrl    String?
+  passwordHash String
+  role         String        @default("USER")
+  commissionBps Int?
+  createdAt    DateTime      @default(now())
+  coachProfile CoachProfile?
+  purchases    Purchase[]
+  reviews      Review[]
+  videos       Video[]       @relation("CoachVideos")
+}
+
+model CoachProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  bio         String
+  specialty   String
+  yearsActive Int
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Video {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String
+  category    String     @default("SERVICE")
+  level       String
+  durationMin Int
+  priceCents  Int
+  thumbnail   String
+  videoUrl    String
+  commissionBpsOverride Int?
+  isPublished Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  coachId     String
+  coach       User       @relation("CoachVideos", fields: [coachId], references: [id])
+  purchases   Purchase[]
+  reviews     Review[]
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  userId    String
+  videoId   String
+  amount    Int
+  commissionBpsAtPurchase Int?
+  commissionAmount Int?
+  coachNetAmount Int?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  video     Video    @relation(fields: [videoId], references: [id])
+
+  @@unique([userId, videoId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  videoId   String
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  video     Video    @relation(fields: [videoId], references: [id])
+
+  @@unique([userId, videoId])
+}
