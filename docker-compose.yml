@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: onlyping-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: onlyping
+      POSTGRES_PASSWORD: onlyping
+      POSTGRES_DB: onlyping
+    ports:
+      - "5432:5432"
+    volumes:
+      - onlyping_pgdata:/var/lib/postgresql/data
+
+volumes:
+  onlyping_pgdata:

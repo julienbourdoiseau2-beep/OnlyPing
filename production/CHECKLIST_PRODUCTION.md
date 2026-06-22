@@ -20,19 +20,20 @@ Objectif: supprimer la dependance SQLite locale pour une prod stable.
    - `provider = "postgresql"`
    - `url = env("DATABASE_URL")`
 4. Configurer `DATABASE_URL` dans les variables d'environnement de prod.
-5. Generer migration locale:
+5. En local, utiliser soit un service Postgres, soit `docker compose up -d db` avec l'URL fournie dans `.env.example`.
+6. Generer migration locale:
 
 ```bash
 npm run prisma:migrate -- --name postgres_init
 ```
 
-6. En prod, appliquer:
+7. En prod, appliquer:
 
 ```bash
 npx prisma migrate deploy
 ```
 
-7. Verifier en base:
+8. Verifier en base:
    - tables `User`, `Video`, `Purchase`, `CoachProfile`
    - index et unique constraints presentes
 

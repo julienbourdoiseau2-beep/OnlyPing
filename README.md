@@ -42,14 +42,20 @@ cp .env.example .env
 npm install
 ```
 
-3. Initialiser la base:
+3. Demarrer Postgres en local:
+
+```bash
+npm run db:up
+```
+
+4. Initialiser la base:
 
 ```bash
 npm run prisma:migrate -- --name init
 npm run db:seed
 ```
 
-4. Lancer en local:
+5. Lancer en local:
 
 ```bash
 npm run dev
@@ -118,6 +124,35 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
 
 4. Copier le secret `whsec_...` affiche par Stripe CLI dans `STRIPE_WEBHOOK_SECRET`.
+
+## Base de donnees PostgreSQL (local)
+
+Le projet utilise PostgreSQL via Prisma. Pour un environnement local standard:
+
+1. Lancer la base:
+
+```bash
+npm run db:up
+```
+
+2. Verifier que `.env` contient une URL de ce type:
+
+```env
+DATABASE_URL=postgresql://onlyping:onlyping@localhost:5432/onlyping?schema=public
+```
+
+3. Appliquer les migrations et peupler la base:
+
+```bash
+npm run prisma:migrate -- --name init
+npm run db:seed
+```
+
+4. Ouvrir Prisma Studio si besoin:
+
+```bash
+npm run prisma:studio
+```
 
 5. Utiliser une carte de test Stripe (ex: 4242 4242 4242 4242) pour acheter une video.
 - La page Mes achats est disponible sur `/mes-achats` pour retrouver vite les videos achetees.
