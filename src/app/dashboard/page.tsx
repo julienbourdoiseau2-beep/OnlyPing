@@ -29,41 +29,41 @@ export default async function DashboardPage() {
     );
   }
 
-  const videos = await prisma.video.findMany({
-    where: { coachId: session.user.id, deletedAt: null },
-    orderBy: { createdAt: "desc" }
-  });
-
-  const coach = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { commissionBps: true }
-  });
-  const coachCommissionBps = coach?.commissionBps ?? null;
-
-  const purchases = await prisma.purchase.findMany({
-    where: {
-      video: {
-        coachId: session.user.id
-      }
-    },
-    select: {
-      amount: true,
-      commissionAmount: true,
-      coachNetAmount: true,
-      commissionBpsAtPurchase: true,
-      createdAt: true,
-      video: {
-        select: {
-          commissionBpsOverride: true,
-          coach: {
-            select: {
-              commissionBps: true
+  const [videos, coach, purchases] = await Promise.all([
+    prisma.video.findMany({
+      where: { coachId: session.user.id, deletedAt: null },
+      orderBy: { createdAt: "desc" }
+    }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { commissionBps: true }
+    }),
+    prisma.purchase.findMany({
+      where: {
+        video: {
+          coachId: session.user.id
+        }
+      },
+      select: {
+        amount: true,
+        commissionAmount: true,
+        coachNetAmount: true,
+        commissionBpsAtPurchase: true,
+        createdAt: true,
+        video: {
+          select: {
+            commissionBpsOverride: true,
+            coach: {
+              select: {
+                commissionBps: true
+              }
             }
           }
         }
       }
-    }
-  });
+    })
+  ]);
+  const coachCommissionBps = coach?.commissionBps ?? null;
 
   let grossCents = 0;
   let commissionCents = 0;

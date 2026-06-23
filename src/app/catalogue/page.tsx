@@ -23,35 +23,67 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
   const rawLevel = (searchParams?.level ?? "").toUpperCase();
   const level = VIDEO_LEVEL_VALUES.includes(rawLevel as (typeof VIDEO_LEVEL_VALUES)[number]) ? rawLevel : "";
 
-  const coaches = await prisma.user.findMany({
-    where: {
-      role: { in: ["COACH", "ADMIN"] },
-      videos: { some: { isPublished: true } }
-    },
-    select: {
-      id: true,
-      name: true
-    },
-    orderBy: { name: "asc" }
-  });
+  const videoWhere = {
+    isPublished: true,
+    deletedAt: null,
+    ...(coachId ? { coachId } : {}),
+    ...(category ? { category } : {}),
+    ...(level ? { level } : {})
+  };
 
-  const videos = await prisma.video.findMany({
-    where: {
-      isPublished: true,
-      ...(coachId ? { coachId } : {}),
-      ...(category ? { category } : {}),
-      ...(level ? { level } : {})
-    },
-    include: {
-      coach: true,
-      reviews: {
-        select: {
-          rating: true
+  const [coaches, videos] = await Promise.all([
+    prisma.user.findMany({
+      where: {
+        role: { in: ["COACH", "ADMIN"] },
+        videos: { some: { isPublished: true, deletedAt: null } }
+      },
+      select: {
+        id: true,
+        name: true
+      },
+      orderBy: { name: "asc" }
+    }),
+    prisma.video.findMany({
+      where: videoWhere,
+      select: {
+        id: true,
+        title: true,
+        thumbnail: true,
+        category: true,
+        level: true,
+        durationMin: true,
+        priceCents: true,
+        coach: {
+          select: {
+            name: true,
+            avatarUrl: true
+          }
         }
-      }
-    },
-    orderBy: { createdAt: "desc" }
-  });
+      },
+      orderBy: { createdAt: "desc" }
+    })
+  ]);
+
+  const videoIds = videos.map((video) => video.id);
+  const reviewStats =
+    videoIds.length > 0
+      ? await prisma.review.groupBy({
+          by: ["videoId"],
+          where: {
+            videoId: { in: videoIds }
+          },
+          _count: {
+            _all: true
+          },
+          _avg: {
+            rating: true
+          }
+        })
+      : [];
+
+  const reviewStatsByVideoId = new Map(
+    reviewStats.map((row) => [row.videoId, { averageRating: row._avg.rating, reviewCount: row._count._all }])
+  );
 
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-12">
@@ -125,10 +157,9 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((video) => {
-          const averageRating =
-            video.reviews.length > 0
-              ? video.reviews.reduce((sum, review) => sum + review.rating, 0) / video.reviews.length
-              : null;
+          const stats = reviewStatsByVideoId.get(video.id);
+          const averageRating = stats?.averageRating ?? null;
+          const reviewCount = stats?.reviewCount ?? 0;
 
           return (
             <VideoCard
@@ -141,7 +172,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
               durationMin={video.durationMin}
               priceCents={video.priceCents}
               averageRating={averageRating}
-              reviewCount={video.reviews.length}
+              reviewCount={reviewCount}
               coachName={video.coach.name}
               coachAvatarUrl={video.coach.avatarUrl}
             />
