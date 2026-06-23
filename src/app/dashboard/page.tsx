@@ -163,6 +163,7 @@ export default async function DashboardPage() {
               <th className="px-4 py-3">Categorie</th>
               <th className="px-4 py-3">Niveau</th>
               <th className="px-4 py-3">Prix</th>
+              <th className="px-4 py-3">Commission</th>
               <th className="px-4 py-3">Publiee</th>
               <th className="px-4 py-3">Action</th>
             </tr>
@@ -174,6 +175,9 @@ export default async function DashboardPage() {
                 <td className="px-4 py-3">{video.category}</td>
                 <td className="px-4 py-3">{toLevelLabel(video.level)}</td>
                 <td className="px-4 py-3">{(video.priceCents / 100).toFixed(2)} EUR</td>
+                <td className="px-4 py-3">
+                  {(getEffectiveCommissionBps(video.commissionBpsOverride, coachCommissionBps) / 100).toFixed(2)} %
+                </td>
                 <td className="px-4 py-3">{video.isPublished ? "Oui" : "Non"}</td>
                 <td className="space-y-2 px-4 py-3">
                   <CoachVideoSettingsForm

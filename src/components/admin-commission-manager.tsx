@@ -28,14 +28,20 @@ function bpsToPercent(bps: number | null) {
   return `${(bps / 100).toFixed(2)}%`;
 }
 
+function percentToBps(percent: number) {
+  return Math.round(percent * 100);
+}
+
 export function AdminCommissionManager({ coaches, videos }: AdminCommissionManagerProps) {
   const [coachId, setCoachId] = useState(coaches[0]?.id ?? "");
-  const [coachCommission, setCoachCommission] = useState<number>(coaches[0]?.commissionBps ?? 3000);
+  const [coachCommissionPercent, setCoachCommissionPercent] = useState<number>((coaches[0]?.commissionBps ?? 3000) / 100);
   const [coachMessage, setCoachMessage] = useState("");
   const [isCoachLoading, setIsCoachLoading] = useState(false);
 
   const [videoId, setVideoId] = useState(videos[0]?.id ?? "");
-  const [videoCommission, setVideoCommission] = useState<number>(videos[0]?.commissionBpsOverride ?? 3000);
+  const [videoCommissionPercent, setVideoCommissionPercent] = useState<number>(
+    (videos[0]?.commissionBpsOverride ?? 3000) / 100
+  );
   const [clearOverride, setClearOverride] = useState(videos[0]?.commissionBpsOverride === null);
   const [videoMessage, setVideoMessage] = useState("");
   const [isVideoLoading, setIsVideoLoading] = useState(false);
@@ -56,7 +62,7 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         coachId,
-        commissionBps: coachCommission
+        commissionBps: percentToBps(coachCommissionPercent)
       })
     });
 
@@ -84,7 +90,7 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         videoId,
-        commissionBpsOverride: clearOverride ? null : videoCommission
+        commissionBpsOverride: clearOverride ? null : percentToBps(videoCommissionPercent)
       })
     });
 
@@ -112,7 +118,7 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
               const newCoachId = event.target.value;
               setCoachId(newCoachId);
               const coach = coaches.find((item) => item.id === newCoachId);
-              setCoachCommission(coach?.commissionBps ?? 3000);
+              setCoachCommissionPercent((coach?.commissionBps ?? 3000) / 100);
             }}
             className="w-full rounded-lg border border-white/20 bg-[#21262d] px-3 py-2 text-sm text-[#edf1f6] [&>option]:bg-[#161b22] [&>option]:text-[#edf1f6]"
           >
@@ -124,13 +130,14 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
           </select>
 
           <label className="block text-sm text-[#b8c1cd]">
-            Commission (en bps: 3000 = 30%)
+            Commission (%)
             <input
               type="number"
               min={0}
-              max={10000}
-              value={coachCommission}
-              onChange={(event) => setCoachCommission(Number(event.target.value))}
+              max={100}
+              step="0.01"
+              value={coachCommissionPercent}
+              onChange={(event) => setCoachCommissionPercent(Number(event.target.value))}
               className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6]"
             />
           </label>
@@ -164,7 +171,7 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
               setVideoId(newVideoId);
               const video = videos.find((item) => item.id === newVideoId);
               setClearOverride(video?.commissionBpsOverride === null);
-              setVideoCommission(video?.commissionBpsOverride ?? 3000);
+              setVideoCommissionPercent((video?.commissionBpsOverride ?? 3000) / 100);
             }}
             className="w-full rounded-lg border border-white/20 bg-[#21262d] px-3 py-2 text-sm text-[#edf1f6] [&>option]:bg-[#161b22] [&>option]:text-[#edf1f6]"
           >
@@ -181,13 +188,14 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
           </label>
 
           <label className="block text-sm text-[#b8c1cd]">
-            Override commission (bps)
+            Override commission (%)
             <input
               type="number"
               min={0}
-              max={10000}
-              value={videoCommission}
-              onChange={(event) => setVideoCommission(Number(event.target.value))}
+              max={100}
+              step="0.01"
+              value={videoCommissionPercent}
+              onChange={(event) => setVideoCommissionPercent(Number(event.target.value))}
               disabled={clearOverride}
               className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] disabled:opacity-50"
             />
