@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { toLevelLabel } from "@/lib/video-taxonomy";
 import { CoachUploadForm } from "@/components/coach-upload-form";
 import { CoachVideoSettingsForm } from "@/components/coach-video-settings-form";
+import { CoachVideosMobileManager } from "@/components/coach-videos-mobile-manager";
 import { DeleteVideoButton } from "@/components/delete-video-button";
 import { PublishToggleButton } from "@/components/publish-toggle-button";
 
@@ -155,49 +156,69 @@ export default async function DashboardPage() {
         <CoachUploadForm />
       </div>
 
-      <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/5 text-[#cbd3dd]">
-            <tr>
-              <th className="px-4 py-3">Titre</th>
-              <th className="px-4 py-3">Categorie</th>
-              <th className="px-4 py-3">Niveau</th>
-              <th className="px-4 py-3">Prix</th>
-              <th className="px-4 py-3">Commission</th>
-              <th className="px-4 py-3">Publiee</th>
-              <th className="px-4 py-3">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {videos.map((video) => (
-              <tr key={video.id} className="border-t border-white/10">
-                <td className="px-4 py-3">{video.title}</td>
-                <td className="px-4 py-3">{video.category}</td>
-                <td className="px-4 py-3">{toLevelLabel(video.level)}</td>
-                <td className="px-4 py-3">{(video.priceCents / 100).toFixed(2)} EUR</td>
-                <td className="px-4 py-3">
-                  {(getEffectiveCommissionBps(video.commissionBpsOverride, coachCommissionBps) / 100).toFixed(2)} %
-                </td>
-                <td className="px-4 py-3">{video.isPublished ? "Oui" : "Non"}</td>
-                <td className="space-y-2 px-4 py-3">
-                  <CoachVideoSettingsForm
-                    videoId={video.id}
-                    initialTitle={video.title}
-                    initialDescription={video.description}
-                    initialCategory={video.category}
-                    initialLevel={video.level}
-                    initialDurationMin={video.durationMin}
-                    initialPriceCents={video.priceCents}
-                    initialThumbnail={video.thumbnail}
-                    effectiveCommissionBps={getEffectiveCommissionBps(video.commissionBpsOverride, coachCommissionBps)}
-                  />
-                  <PublishToggleButton videoId={video.id} isPublished={video.isPublished} />
-                  <DeleteVideoButton videoId={video.id} title={video.title} />
-                </td>
+      <div className="mt-8 md:hidden">
+        <CoachVideosMobileManager
+          videos={videos.map((video) => ({
+            id: video.id,
+            title: video.title,
+            description: video.description,
+            category: video.category,
+            level: video.level,
+            durationMin: video.durationMin,
+            priceCents: video.priceCents,
+            thumbnail: video.thumbnail,
+            isPublished: video.isPublished,
+            commissionBpsOverride: video.commissionBpsOverride
+          }))}
+          coachCommissionBps={coachCommissionBps}
+        />
+      </div>
+
+      <div className="mt-8 hidden overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80 md:block">
+        <div className="overflow-x-auto">
+          <table className="min-w-[980px] text-left text-sm">
+            <thead className="bg-white/5 text-[#cbd3dd]">
+              <tr>
+                <th className="px-4 py-3">Titre</th>
+                <th className="px-4 py-3">Categorie</th>
+                <th className="px-4 py-3">Niveau</th>
+                <th className="px-4 py-3">Prix</th>
+                <th className="px-4 py-3">Commission</th>
+                <th className="px-4 py-3">Publiee</th>
+                <th className="px-4 py-3">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {videos.map((video) => (
+                <tr key={video.id} className="border-t border-white/10">
+                  <td className="px-4 py-3">{video.title}</td>
+                  <td className="px-4 py-3">{video.category}</td>
+                  <td className="px-4 py-3">{toLevelLabel(video.level)}</td>
+                  <td className="px-4 py-3">{(video.priceCents / 100).toFixed(2)} EUR</td>
+                  <td className="px-4 py-3">
+                    {(getEffectiveCommissionBps(video.commissionBpsOverride, coachCommissionBps) / 100).toFixed(2)} %
+                  </td>
+                  <td className="px-4 py-3">{video.isPublished ? "Oui" : "Non"}</td>
+                  <td className="space-y-2 px-4 py-3">
+                    <CoachVideoSettingsForm
+                      videoId={video.id}
+                      initialTitle={video.title}
+                      initialDescription={video.description}
+                      initialCategory={video.category}
+                      initialLevel={video.level}
+                      initialDurationMin={video.durationMin}
+                      initialPriceCents={video.priceCents}
+                      initialThumbnail={video.thumbnail}
+                      effectiveCommissionBps={getEffectiveCommissionBps(video.commissionBpsOverride, coachCommissionBps)}
+                    />
+                    <PublishToggleButton videoId={video.id} isPublished={video.isPublished} />
+                    <DeleteVideoButton videoId={video.id} title={video.title} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
