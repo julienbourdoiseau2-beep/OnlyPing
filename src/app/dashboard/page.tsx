@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { toLevelLabel } from "@/lib/video-taxonomy";
 import { CoachUploadForm } from "@/components/coach-upload-form";
 import { CoachVideoSettingsForm } from "@/components/coach-video-settings-form";
+import { DeleteVideoButton } from "@/components/delete-video-button";
 import { PublishToggleButton } from "@/components/publish-toggle-button";
 
 export default async function DashboardPage() {
@@ -29,7 +30,7 @@ export default async function DashboardPage() {
   }
 
   const videos = await prisma.video.findMany({
-    where: { coachId: session.user.id },
+    where: { coachId: session.user.id, deletedAt: null },
     orderBy: { createdAt: "desc" }
   });
 
@@ -187,6 +188,7 @@ export default async function DashboardPage() {
                     effectiveCommissionBps={getEffectiveCommissionBps(video.commissionBpsOverride, coachCommissionBps)}
                   />
                   <PublishToggleButton videoId={video.id} isPublished={video.isPublished} />
+                  <DeleteVideoButton videoId={video.id} title={video.title} />
                 </td>
               </tr>
             ))}

@@ -1,7 +1,8 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { deleteFromR2, isR2Enabled, parseR2PublicUrl, parseR2VideoRef, toPublicR2Url, uploadToR2 } from "@/lib/r2";
 import { VIDEO_CATEGORY_VALUES, VIDEO_LEVEL_VALUES } from "@/lib/video-taxonomy";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, unlink, writeFile } from "fs/promises";
 import { getServerSession } from "next-auth";
 import { join } from "path";
 import { NextResponse } from "next/server";
@@ -45,10 +46,10 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const video = await prisma.video.findUnique({
     where: { id: context.params.id },
-    select: { id: true, coachId: true }
+    select: { id: true, coachId: true, videoUrl: true, thumbnail: true, deletedAt: true }
   });
 
-  if (!video) {
+  if (!video || video.deletedAt) {
     return NextResponse.json({ error: "Video introuvable" }, { status: 404 });
   }
 
@@ -70,13 +71,25 @@ export async function PATCH(request: Request, context: RouteContext) {
       ? thumbnailFile.name.slice(thumbnailFile.name.lastIndexOf("."))
       : ".jpg";
     const thumbnailName = `thumb-${Date.now()}-${Math.random().toString(36).slice(2, 10)}${thumbnailExt}`;
-    const publicUploadDir = join(process.cwd(), "public", "uploads");
-    const thumbnailAbsolutePath = join(publicUploadDir, thumbnailName);
-
-    await mkdir(publicUploadDir, { recursive: true });
     const thumbnailBytes = await thumbnailFile.arrayBuffer();
-    await writeFile(thumbnailAbsolutePath, Buffer.from(thumbnailBytes));
-    thumbnailUrl = `/uploads/${thumbnailName}`;
+    const thumbnailBuffer = Buffer.from(thumbnailBytes);
+
+    if (isR2Enabled()) {
+      const thumbnailKey = `thumbnails/${new Date().getUTCFullYear()}/${new Date().getUTCMonth() + 1}/${thumbnailName}`;
+      await uploadToR2({
+        key: thumbnailKey,
+        body: thumbnailBuffer,
+        contentType: thumbnailFile.type || "image/jpeg",
+        cacheControl: "public, max-age=31536000, immutable"
+      });
+      thumbnailUrl = toPublicR2Url(thumbnailKey) || thumbnailUrl;
+    } else {
+      const publicUploadDir = join(process.cwd(), "public", "uploads");
+      const thumbnailAbsolutePath = join(publicUploadDir, thumbnailName);
+      await mkdir(publicUploadDir, { recursive: true });
+      await writeFile(thumbnailAbsolutePath, thumbnailBuffer);
+      thumbnailUrl = `/uploads/${thumbnailName}`;
+    }
   }
 
   const updated = await prisma.video.update({
@@ -100,4 +113,63 @@ export async function PATCH(request: Request, context: RouteContext) {
   });
 
   return NextResponse.json(updated);
+}
+
+export async function DELETE(_: Request, context: RouteContext) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || (session.user.role !== "COACH" && session.user.role !== "ADMIN")) {
+    return NextResponse.json({ error: "Acces refuse" }, { status: 403 });
+  }
+
+  const video = await prisma.video.findUnique({
+    where: { id: context.params.id },
+    select: {
+      id: true,
+      coachId: true,
+      videoUrl: true,
+      thumbnail: true,
+      deletedAt: true
+    }
+  });
+
+  if (!video) {
+    return NextResponse.json({ error: "Video introuvable" }, { status: 404 });
+  }
+
+  if (video.deletedAt) {
+    return NextResponse.json({ error: "Video deja supprimee" }, { status: 410 });
+  }
+
+  if (session.user.role !== "ADMIN" && video.coachId !== session.user.id) {
+    return NextResponse.json({ error: "Acces refuse" }, { status: 403 });
+  }
+
+  await prisma.video.update({
+    where: { id: video.id },
+    data: { deletedAt: new Date() }
+  });
+
+  if (video.videoUrl.startsWith("local:")) {
+    const fileName = video.videoUrl.replace("local:", "");
+    const absolutePath = join(process.cwd(), "storage", "private-videos", fileName);
+    await unlink(absolutePath).catch(() => undefined);
+  }
+
+  const r2VideoKey = parseR2VideoRef(video.videoUrl);
+  if (r2VideoKey) {
+    await deleteFromR2(r2VideoKey).catch(() => undefined);
+  }
+
+  if (video.thumbnail.startsWith("/uploads/")) {
+    const thumbnailFileName = video.thumbnail.replace("/uploads/", "");
+    const thumbnailAbsolutePath = join(process.cwd(), "public", "uploads", thumbnailFileName);
+    await unlink(thumbnailAbsolutePath).catch(() => undefined);
+  }
+
+  const r2ThumbnailKey = parseR2PublicUrl(video.thumbnail);
+  if (r2ThumbnailKey) {
+    await deleteFromR2(r2ThumbnailKey).catch(() => undefined);
+  }
+
+  return NextResponse.json({ ok: true });
 }

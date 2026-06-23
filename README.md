@@ -6,7 +6,7 @@ Base de projet pour une plateforme de vente de videos techniques de ping-pong al
 
 - Next.js 14 (App Router) + TypeScript
 - Tailwind CSS
-- Prisma + SQLite
+- Prisma + PostgreSQL
 - NextAuth (credentials)
 
 ## Fonctionnalites incluses
@@ -87,9 +87,35 @@ Application disponible sur http://localhost:3000
 
 - Le bouton "Acheter" sur la page detail est en mode demo (pas de fournisseur de paiement branche).
 - Tu peux brancher Stripe plus tard dans `src/app/api/purchase/route.ts`.
-- Upload video local disponible dans l'espace coach: le fichier est enregistre dans `storage/private-videos` via `src/app/api/coach/videos/route.ts`.
+- Upload video: stockage R2 en production (si variables R2 configurees), sinon fallback local `storage/private-videos`.
 - La lecture est debloquee apres achat via un stream protege `src/app/api/videos/[id]/stream/route.ts`.
 - Paiement Stripe: creation session checkout `src/app/api/checkout/route.ts` + webhook `src/app/api/webhooks/stripe/route.ts`.
+
+## Stockage Cloudflare R2 (prod)
+
+Configurer ces variables dans ton environnement de production:
+
+- `R2_ENDPOINT` (ex: `https://<accountid>.r2.cloudflarestorage.com`)
+- `R2_BUCKET`
+- `R2_REGION` (`auto`)
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `R2_PUBLIC_BASE_URL` (URL publique du bucket pour les miniatures)
+
+Quand ces variables sont presentes:
+
+- les videos sont ecrites dans R2 et stockees en DB sous format `r2:<key>`
+- la route protegee de stream genere une URL signee courte (120s)
+- les miniatures sont ecrites dans R2 et exposees via `R2_PUBLIC_BASE_URL`
+
+Sans ces variables, l'application reste fonctionnelle en mode local.
+
+## Strategie local vs prod (.env)
+
+- Local: conserver `DATABASE_URL` sur PostgreSQL local et laisser les variables `R2_*` vides.
+- Production: configurer `DATABASE_URL` de prod + toutes les variables `R2_*` dans l'hebergeur.
+- Ne jamais commiter les secrets de production dans le repo.
+- Si un mot de passe DB contient des caracteres speciaux, l'encoder dans l'URL (ex: `!` devient `%21`).
 
 ## Paiement Stripe (local)
 

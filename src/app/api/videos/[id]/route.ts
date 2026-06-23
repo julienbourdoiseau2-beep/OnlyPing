@@ -13,7 +13,7 @@ export async function GET(_: Request, context: RouteContext) {
     include: { coach: true }
   });
 
-  if (!video || !video.isPublished) {
+  if (!video || !video.isPublished || video.deletedAt) {
     return NextResponse.json({ error: "Video non trouvee" }, { status: 404 });
   }
 

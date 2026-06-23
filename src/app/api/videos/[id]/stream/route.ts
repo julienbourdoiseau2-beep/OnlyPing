@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getR2SignedReadUrl, isR2Enabled, parseR2VideoRef } from "@/lib/r2";
 import { readFile } from "fs/promises";
 import { getServerSession } from "next-auth";
 import { join } from "path";
@@ -30,6 +31,7 @@ export async function GET(_: Request, context: RouteContext) {
       id: true,
       coachId: true,
       isPublished: true,
+      deletedAt: true,
       videoUrl: true,
       purchases: {
         where: { userId: session.user.id },
@@ -38,13 +40,21 @@ export async function GET(_: Request, context: RouteContext) {
     }
   });
 
-  if (!video || !video.isPublished) {
+  if (!video) {
     return NextResponse.json({ error: "Video introuvable" }, { status: 404 });
   }
 
   const isAdmin = session.user.role === "ADMIN";
   const isOwnerCoach = video.coachId === session.user.id;
   const hasPurchased = video.purchases.length > 0;
+
+  if (video.deletedAt && !isAdmin && !isOwnerCoach && !hasPurchased) {
+    return NextResponse.json({ error: "Video supprimee" }, { status: 404 });
+  }
+
+  if (!video.isPublished && !isAdmin && !isOwnerCoach && !hasPurchased) {
+    return NextResponse.json({ error: "Video introuvable" }, { status: 404 });
+  }
 
   if (!isAdmin && !isOwnerCoach && !hasPurchased) {
     return NextResponse.json({ error: "Achat requis" }, { status: 403 });
@@ -62,6 +72,16 @@ export async function GET(_: Request, context: RouteContext) {
         "Cache-Control": "private, no-store"
       }
     });
+  }
+
+  const r2Key = parseR2VideoRef(video.videoUrl);
+  if (r2Key) {
+    if (!isR2Enabled()) {
+      return NextResponse.json({ error: "R2 non configure" }, { status: 500 });
+    }
+
+    const signedUrl = await getR2SignedReadUrl(r2Key, 120);
+    return NextResponse.redirect(signedUrl);
   }
 
   if (video.videoUrl.startsWith("http://") || video.videoUrl.startsWith("https://") || video.videoUrl.startsWith("/")) {

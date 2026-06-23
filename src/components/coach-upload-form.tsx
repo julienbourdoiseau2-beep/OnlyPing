@@ -39,8 +39,8 @@ export function CoachUploadForm() {
 
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-      <h2 className="text-2xl font-semibold">Ajouter une video (local)</h2>
-      <p className="mt-1 text-sm text-[#b8c1cd]">Le fichier est stocke dans public/uploads en local.</p>
+      <h2 className="text-2xl font-semibold">Ajouter une video</h2>
+      <p className="mt-1 text-sm text-[#b8c1cd]">Le stockage est gere automatiquement (R2 en production, local en fallback).</p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <input

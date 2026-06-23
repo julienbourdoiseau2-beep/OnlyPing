@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -44,6 +45,7 @@ model Video {
   videoUrl    String
   commissionBpsOverride Int?
   isPublished Boolean    @default(false)
+  deletedAt   DateTime?
   createdAt   DateTime   @default(now())
   coachId     String
   coach       User       @relation("CoachVideos", fields: [coachId], references: [id])

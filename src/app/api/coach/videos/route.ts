@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isR2Enabled, toPublicR2Url, toR2VideoRef, uploadToR2 } from "@/lib/r2";
 import { VIDEO_CATEGORY_VALUES, VIDEO_LEVEL_VALUES } from "@/lib/video-taxonomy";
 import { mkdir, writeFile } from "fs/promises";
 import { getServerSession } from "next-auth";
@@ -63,12 +64,25 @@ export async function POST(request: Request) {
 
   const ext = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".")) : ".mp4";
   const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`;
-  const uploadDir = join(process.cwd(), "storage", "private-videos");
-  const absolutePath = join(uploadDir, uniqueName);
-
-  await mkdir(uploadDir, { recursive: true });
   const bytes = await file.arrayBuffer();
-  await writeFile(absolutePath, Buffer.from(bytes));
+  const videoBuffer = Buffer.from(bytes);
+  const r2VideoKey = `videos/${new Date().getUTCFullYear()}/${new Date().getUTCMonth() + 1}/${uniqueName}`;
+
+  let videoUrl = `local:${uniqueName}`;
+  if (isR2Enabled()) {
+    await uploadToR2({
+      key: r2VideoKey,
+      body: videoBuffer,
+      contentType: file.type || "video/mp4",
+      cacheControl: "private, max-age=0, no-store"
+    });
+    videoUrl = toR2VideoRef(r2VideoKey);
+  } else {
+    const uploadDir = join(process.cwd(), "storage", "private-videos");
+    const absolutePath = join(uploadDir, uniqueName);
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(absolutePath, videoBuffer);
+  }
 
   let thumbnailUrl = thumbnail || "";
   if (thumbnailFile instanceof File && thumbnailFile.size > 0) {
@@ -84,13 +98,25 @@ export async function POST(request: Request) {
       ? thumbnailFile.name.slice(thumbnailFile.name.lastIndexOf("."))
       : ".jpg";
     const thumbnailName = `thumb-${Date.now()}-${Math.random().toString(36).slice(2, 10)}${thumbnailExt}`;
-    const publicUploadDir = join(process.cwd(), "public", "uploads");
-    const thumbnailAbsolutePath = join(publicUploadDir, thumbnailName);
-
-    await mkdir(publicUploadDir, { recursive: true });
     const thumbnailBytes = await thumbnailFile.arrayBuffer();
-    await writeFile(thumbnailAbsolutePath, Buffer.from(thumbnailBytes));
-    thumbnailUrl = `/uploads/${thumbnailName}`;
+    const thumbnailBuffer = Buffer.from(thumbnailBytes);
+
+    if (isR2Enabled()) {
+      const thumbnailKey = `thumbnails/${new Date().getUTCFullYear()}/${new Date().getUTCMonth() + 1}/${thumbnailName}`;
+      await uploadToR2({
+        key: thumbnailKey,
+        body: thumbnailBuffer,
+        contentType: thumbnailFile.type || "image/jpeg",
+        cacheControl: "public, max-age=31536000, immutable"
+      });
+      thumbnailUrl = toPublicR2Url(thumbnailKey) || thumbnailUrl;
+    } else {
+      const publicUploadDir = join(process.cwd(), "public", "uploads");
+      const thumbnailAbsolutePath = join(publicUploadDir, thumbnailName);
+      await mkdir(publicUploadDir, { recursive: true });
+      await writeFile(thumbnailAbsolutePath, thumbnailBuffer);
+      thumbnailUrl = `/uploads/${thumbnailName}`;
+    }
   }
 
   const baseSlug = toSlug(title) || "video";
@@ -106,7 +132,7 @@ export async function POST(request: Request) {
       durationMin,
       priceCents,
       thumbnail: thumbnailUrl,
-      videoUrl: `local:${uniqueName}`,
+      videoUrl,
       isPublished: false,
       coachId: session.user.id
     }

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const videos = await prisma.video.findMany({
-    where: { isPublished: true },
+    where: { isPublished: true, deletedAt: null },
     include: { coach: true },
     orderBy: { createdAt: "desc" }
   });

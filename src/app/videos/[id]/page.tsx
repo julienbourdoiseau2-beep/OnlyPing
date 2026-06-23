@@ -44,7 +44,7 @@ export default async function VideoDetailsPage({ params }: Params) {
     }
   });
 
-  if (!video || !video.isPublished) {
+  if (!video) {
     notFound();
   }
 
@@ -59,9 +59,17 @@ export default async function VideoDetailsPage({ params }: Params) {
       }))
     : false;
 
+  const isAdmin = session?.user?.role === "ADMIN";
+  const isCoach = session?.user?.id === video.coachId;
+
+  const isAccessible = video.isPublished || (video.deletedAt && (hasPurchased || isAdmin || isCoach));
+  if (!isAccessible && !isAdmin && !isCoach) {
+    notFound();
+  }
+
   const canWatch =
     !!session?.user &&
-    (session.user.role === "ADMIN" || session.user.id === video.coachId || hasPurchased);
+    (isAdmin || isCoach || hasPurchased);
   const showThumbnail = Boolean(video.thumbnail && video.thumbnail !== "/uploads/default-thumb.jpg");
 
   const categoryLabel =
