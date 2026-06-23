@@ -17,7 +17,27 @@ const bodyFont = Poppins({
 
 export const metadata: Metadata = {
   title: "OnlyPing - Videos techniques de ping-pong",
-  description: "Plateforme de videos techniques de ping-pong alimentee par des entraineurs."
+  description: "Plateforme de videos techniques de ping-pong alimentee par des entraineurs.",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "OnlyPing"
+  },
+  formatDetection: {
+    telephone: false
+  },
+  themeColor: "#1f6feb",
+  icons: {
+    icon: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" }
+    ],
+    apple: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" }
+    ]
+  }
 };
 
 export default function RootLayout({
