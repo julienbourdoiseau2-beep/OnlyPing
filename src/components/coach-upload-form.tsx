@@ -9,15 +9,61 @@ export function CoachUploadForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadStep, setUploadStep] = useState("");
+  const [priceEuros, setPriceEuros] = useState("");
+
+  function uploadFileWithProgress(uploadUrl: string, file: File) {
+    return new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", uploadUrl);
+      xhr.setRequestHeader("Content-Type", file.type || "video/mp4");
+
+      xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable) {
+          return;
+        }
+
+        const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
+        setUploadProgress(percent);
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve();
+          return;
+        }
+        reject(new Error(`Upload HTTP ${xhr.status}`));
+      };
+
+      xhr.onerror = () => {
+        reject(new Error("Erreur reseau pendant l'upload"));
+      };
+
+      xhr.send(file);
+    });
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSuccess("");
+    setUploadProgress(null);
+    setUploadStep("");
     setIsLoading(true);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    const numericEuros = Number(priceEuros.replace(",", "."));
+    const priceCents = Math.round(numericEuros * 100);
+    if (!Number.isFinite(numericEuros) || numericEuros < 0) {
+      setIsLoading(false);
+      setError("Prix invalide");
+      return;
+    }
+    formData.delete("priceEuros");
+    formData.set("priceCents", String(priceCents));
 
     const videoFile = formData.get("video");
     if (!(videoFile instanceof File)) {
@@ -37,21 +83,24 @@ export function CoachUploadForm() {
     });
 
     if (signedUploadResponse.ok) {
+      setUploadStep("Preparation de l'upload...");
       const signedPayload = (await signedUploadResponse.json()) as { key: string; uploadUrl: string };
 
-      const uploadResponse = await fetch(signedPayload.uploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": videoFile.type || "video/mp4"
-        },
-        body: videoFile
-      });
+      setUploadStep("Envoi de la video...");
+      setUploadProgress(0);
 
-      if (!uploadResponse.ok) {
+      try {
+        await uploadFileWithProgress(signedPayload.uploadUrl, videoFile);
+      } catch {
         setIsLoading(false);
+        setUploadProgress(null);
+        setUploadStep("");
         setError("Upload video R2 impossible");
         return;
       }
+
+      setUploadProgress(100);
+      setUploadStep("Finalisation...");
 
       formData.delete("video");
       formData.append("videoR2Key", signedPayload.key);
@@ -60,6 +109,8 @@ export function CoachUploadForm() {
       // Large multipart requests can fail before reaching the API on serverless platforms.
       if (videoFile.size > 4 * 1024 * 1024) {
         setIsLoading(false);
+        setUploadProgress(null);
+        setUploadStep("");
         setError(payload.error ?? "Upload direct indisponible. Impossible d'envoyer une grosse video via la fonction API.");
         return;
       }
@@ -71,6 +122,8 @@ export function CoachUploadForm() {
     });
 
     setIsLoading(false);
+    setUploadProgress(null);
+    setUploadStep("");
 
     if (!response.ok) {
       const payload = (await response.json().catch(() => ({}))) as { error?: string };
@@ -79,6 +132,7 @@ export function CoachUploadForm() {
     }
 
     form.reset();
+    setPriceEuros("");
     setSuccess("Video enregistree en brouillon.");
     router.refresh();
   }
@@ -124,12 +178,14 @@ export function CoachUploadForm() {
           className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
         />
         <input
-          name="priceCents"
+          name="priceEuros"
           type="number"
           min={0}
-          step={10}
+          step="0.01"
           required
-          placeholder="Prix en centimes (ex: 1990)"
+          value={priceEuros}
+          onChange={(event) => setPriceEuros(event.target.value)}
+          placeholder="Prix en euros (ex: 19.90)"
           className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
         />
       </div>
@@ -173,6 +229,21 @@ export function CoachUploadForm() {
 
       {error ? <p className="mt-3 text-sm text-[#ff6b6b]">{error}</p> : null}
       {success ? <p className="mt-3 text-sm text-[#d7dde5]">{success}</p> : null}
+
+      {isLoading ? (
+        <div className="mt-3 rounded-lg border border-white/20 bg-white/5 p-3">
+          <div className="flex items-center justify-between text-xs text-[#b8c1cd]">
+            <span>{uploadStep || "Traitement..."}</span>
+            <span>{uploadProgress !== null ? `${uploadProgress}%` : "..."}</span>
+          </div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full bg-[#f5c842] transition-all duration-200"
+              style={{ width: `${uploadProgress ?? 15}%` }}
+            />
+          </div>
+        </div>
+      ) : null}
 
       <button
         type="submit"
