@@ -1,4 +1,4 @@
-const CACHE_NAME = "onlyping-v2";
+const CACHE_NAME = "onlyping-v3";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME));
@@ -58,7 +58,7 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
-  const isStaticAsset = ["image", "style", "script", "font"].includes(event.request.destination);
+  const isStaticAsset = ["image", "style", "font"].includes(event.request.destination);
 
   if (!isSameOrigin || !isStaticAsset) {
     return;

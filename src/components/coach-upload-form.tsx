@@ -117,14 +117,11 @@ export function CoachUploadForm() {
       formData.append("videoR2Key", signedPayload.key);
     } else {
       const payload = (await signedUploadResponse.json().catch(() => ({}))) as { error?: string };
-      // Large multipart requests can fail before reaching the API on serverless platforms.
-      if (videoFile.size > 4 * 1024 * 1024) {
-        setIsLoading(false);
-        setUploadProgress(null);
-        setUploadStep("");
-        setError(payload.error ?? "Upload direct indisponible. Impossible d'envoyer une grosse video via la fonction API.");
-        return;
-      }
+      setIsLoading(false);
+      setUploadProgress(null);
+      setUploadStep("");
+      setError(payload.error ?? "Upload direct indisponible. L'application bloque l'envoi direct a l'API pour eviter FUNCTION_PAYLOAD_TOO_LARGE.");
+      return;
     }
 
     const response = await fetch("/api/coach/videos", {

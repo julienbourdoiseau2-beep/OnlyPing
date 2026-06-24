@@ -4,16 +4,15 @@ import { useEffect } from "react";
 
 export function RegisterServiceWorker() {
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/service-worker.js")
-        .then((registration) => {
-          console.log("Service Worker enregistré :", registration);
-        })
-        .catch((error) => {
-          console.log("Service Worker non supporté :", error);
-        });
+    if (!("serviceWorker" in navigator)) {
+      return;
     }
+
+    // Temporary safety mode: fully disable SW to avoid stale cached bundles on mobile uploads.
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => undefined);
   }, []);
 
   return null;
