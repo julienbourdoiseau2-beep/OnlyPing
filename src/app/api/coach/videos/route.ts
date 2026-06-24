@@ -29,6 +29,7 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("video");
+  const videoR2Key = String(formData.get("videoR2Key") ?? "").trim();
   const thumbnailFile = formData.get("thumbnailFile");
   const title = String(formData.get("title") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim().toUpperCase();
@@ -38,16 +39,24 @@ export async function POST(request: Request) {
   const priceCents = Number(formData.get("priceCents") ?? 0);
   const thumbnail = String(formData.get("thumbnail") ?? "").trim();
 
-  if (!(file instanceof File)) {
+  const hasDirectR2Video = videoR2Key.length > 0;
+
+  if (!hasDirectR2Video && !(file instanceof File)) {
     return NextResponse.json({ error: "Fichier video manquant" }, { status: 400 });
   }
 
-  if (!allowedMimeTypes.includes(file.type)) {
-    return NextResponse.json({ error: "Format video non supporte" }, { status: 400 });
+  if (file instanceof File) {
+    if (!allowedMimeTypes.includes(file.type)) {
+      return NextResponse.json({ error: "Format video non supporte" }, { status: 400 });
+    }
+
+    if (file.size > maxSizeInBytes) {
+      return NextResponse.json({ error: "Fichier trop lourd (max 500MB)" }, { status: 400 });
+    }
   }
 
-  if (file.size > maxSizeInBytes) {
-    return NextResponse.json({ error: "Fichier trop lourd (max 500MB)" }, { status: 400 });
+  if (hasDirectR2Video && (!videoR2Key.startsWith("videos/") || videoR2Key.includes(".."))) {
+    return NextResponse.json({ error: "Reference video invalide" }, { status: 400 });
   }
 
   if (!title || !description || !level || !Number.isFinite(durationMin) || !Number.isFinite(priceCents)) {
@@ -62,26 +71,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Niveau invalide" }, { status: 400 });
   }
 
-  const ext = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".")) : ".mp4";
-  const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`;
-  const bytes = await file.arrayBuffer();
-  const videoBuffer = Buffer.from(bytes);
-  const r2VideoKey = `videos/${new Date().getUTCFullYear()}/${new Date().getUTCMonth() + 1}/${uniqueName}`;
+  let videoUrl = "";
+  if (hasDirectR2Video) {
+    videoUrl = toR2VideoRef(videoR2Key);
+  } else if (file instanceof File) {
+    const ext = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".")) : ".mp4";
+    const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`;
+    const bytes = await file.arrayBuffer();
+    const videoBuffer = Buffer.from(bytes);
+    const r2VideoKey = `videos/${new Date().getUTCFullYear()}/${new Date().getUTCMonth() + 1}/${uniqueName}`;
 
-  let videoUrl = `local:${uniqueName}`;
-  if (isR2Enabled()) {
-    await uploadToR2({
-      key: r2VideoKey,
-      body: videoBuffer,
-      contentType: file.type || "video/mp4",
-      cacheControl: "private, max-age=0, no-store"
-    });
-    videoUrl = toR2VideoRef(r2VideoKey);
-  } else {
-    const uploadDir = join(process.cwd(), "storage", "private-videos");
-    const absolutePath = join(uploadDir, uniqueName);
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(absolutePath, videoBuffer);
+    videoUrl = `local:${uniqueName}`;
+    if (isR2Enabled()) {
+      await uploadToR2({
+        key: r2VideoKey,
+        body: videoBuffer,
+        contentType: file.type || "video/mp4",
+        cacheControl: "private, max-age=0, no-store"
+      });
+      videoUrl = toR2VideoRef(r2VideoKey);
+    } else {
+      const uploadDir = join(process.cwd(), "storage", "private-videos");
+      const absolutePath = join(uploadDir, uniqueName);
+      await mkdir(uploadDir, { recursive: true });
+      await writeFile(absolutePath, videoBuffer);
+    }
   }
 
   let thumbnailUrl = thumbnail || "";

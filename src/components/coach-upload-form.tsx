@@ -19,6 +19,52 @@ export function CoachUploadForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
+    const videoFile = formData.get("video");
+    if (!(videoFile instanceof File)) {
+      setIsLoading(false);
+      setError("Fichier video manquant");
+      return;
+    }
+
+    // Upload video directly to R2 to bypass serverless payload limits (ex: Vercel FUNCTION_PAYLOAD_TOO_LARGE).
+    const signedUploadResponse = await fetch("/api/coach/videos/upload-url", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fileName: videoFile.name,
+        contentType: videoFile.type || "video/mp4"
+      })
+    });
+
+    if (signedUploadResponse.ok) {
+      const signedPayload = (await signedUploadResponse.json()) as { key: string; uploadUrl: string };
+
+      const uploadResponse = await fetch(signedPayload.uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": videoFile.type || "video/mp4"
+        },
+        body: videoFile
+      });
+
+      if (!uploadResponse.ok) {
+        setIsLoading(false);
+        setError("Upload video R2 impossible");
+        return;
+      }
+
+      formData.delete("video");
+      formData.append("videoR2Key", signedPayload.key);
+    } else {
+      const payload = (await signedUploadResponse.json().catch(() => ({}))) as { error?: string };
+      // Large multipart requests can fail before reaching the API on serverless platforms.
+      if (videoFile.size > 4 * 1024 * 1024) {
+        setIsLoading(false);
+        setError(payload.error ?? "Upload direct indisponible. Impossible d'envoyer une grosse video via la fonction API.");
+        return;
+      }
+    }
+
     const response = await fetch("/api/coach/videos", {
       method: "POST",
       body: formData

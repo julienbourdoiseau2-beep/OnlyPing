@@ -64,6 +64,28 @@ export async function getR2SignedReadUrl(key: string, expiresInSeconds = 120) {
   );
 }
 
+export async function getR2SignedUploadUrl(params: {
+  key: string;
+  contentType?: string;
+  cacheControl?: string;
+  expiresInSeconds?: number;
+}) {
+  if (!r2Client) {
+    throw new Error("R2 non configure");
+  }
+
+  return getSignedUrl(
+    r2Client,
+    new PutObjectCommand({
+      Bucket: env("R2_BUCKET"),
+      Key: params.key,
+      ContentType: params.contentType,
+      CacheControl: params.cacheControl
+    }),
+    { expiresIn: params.expiresInSeconds ?? 300 }
+  );
+}
+
 export function toR2VideoRef(key: string) {
   return `r2:${key}`;
 }
