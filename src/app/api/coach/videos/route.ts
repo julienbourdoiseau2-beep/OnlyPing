@@ -27,6 +27,82 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Acces refuse" }, { status: 403 });
   }
 
+  const contentTypeHeader = request.headers.get("content-type") || "";
+  if (contentTypeHeader.includes("application/json")) {
+    const body = (await request.json().catch(() => null)) as
+      | {
+          title?: string;
+          category?: string;
+          description?: string;
+          level?: string;
+          durationMin?: number;
+          priceCents?: number;
+          thumbnail?: string;
+          videoR2Key?: string;
+          thumbnailR2Key?: string;
+        }
+      | null;
+
+    if (!body) {
+      return NextResponse.json({ error: "Payload invalide" }, { status: 400 });
+    }
+
+    const title = String(body.title ?? "").trim();
+    const category = String(body.category ?? "").trim().toUpperCase();
+    const description = String(body.description ?? "").trim();
+    const level = String(body.level ?? "").trim().toUpperCase();
+    const durationMin = Number(body.durationMin ?? 0);
+    const priceCents = Number(body.priceCents ?? 0);
+    const thumbnail = String(body.thumbnail ?? "").trim();
+    const videoR2Key = String(body.videoR2Key ?? "").trim();
+    const thumbnailR2Key = String(body.thumbnailR2Key ?? "").trim();
+
+    if (!title || !description || !level || !Number.isFinite(durationMin) || !Number.isFinite(priceCents)) {
+      return NextResponse.json({ error: "Champs invalides" }, { status: 400 });
+    }
+
+    if (!VIDEO_CATEGORY_VALUES.includes(category as (typeof VIDEO_CATEGORY_VALUES)[number])) {
+      return NextResponse.json({ error: "Categorie invalide" }, { status: 400 });
+    }
+
+    if (!VIDEO_LEVEL_VALUES.includes(level as (typeof VIDEO_LEVEL_VALUES)[number])) {
+      return NextResponse.json({ error: "Niveau invalide" }, { status: 400 });
+    }
+
+    if (!videoR2Key || !videoR2Key.startsWith("videos/") || videoR2Key.includes("..")) {
+      return NextResponse.json({ error: "Reference video invalide" }, { status: 400 });
+    }
+
+    let thumbnailUrl = thumbnail;
+    if (thumbnailR2Key) {
+      if (!thumbnailR2Key.startsWith("thumbnails/") || thumbnailR2Key.includes("..")) {
+        return NextResponse.json({ error: "Reference miniature invalide" }, { status: 400 });
+      }
+      thumbnailUrl = toPublicR2Url(thumbnailR2Key) || thumbnailUrl;
+    }
+
+    const baseSlug = toSlug(title) || "video";
+    const slug = `${baseSlug}-${Date.now().toString().slice(-6)}`;
+
+    const created = await prisma.video.create({
+      data: {
+        title,
+        slug,
+        description,
+        category,
+        level,
+        durationMin,
+        priceCents,
+        thumbnail: thumbnailUrl,
+        videoUrl: toR2VideoRef(videoR2Key),
+        isPublished: false,
+        coachId: session.user.id
+      }
+    });
+
+    return NextResponse.json(created, { status: 201 });
+  }
+
   const formData = await request.formData();
   const file = formData.get("video");
   const videoR2Key = String(formData.get("videoR2Key") ?? "").trim();

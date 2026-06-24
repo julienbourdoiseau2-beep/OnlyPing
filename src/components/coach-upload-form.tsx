@@ -84,7 +84,8 @@ export function CoachUploadForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fileName: videoFile.name,
-        contentType: videoFile.type || "video/mp4"
+        contentType: videoFile.type || "video/mp4",
+        kind: "video"
       })
     });
 
@@ -124,9 +125,64 @@ export function CoachUploadForm() {
       return;
     }
 
+    const thumbnailFile = formData.get("thumbnailFile");
+    if (thumbnailFile instanceof File && thumbnailFile.size > 0) {
+      const signedThumbResponse = await fetch("/api/coach/videos/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: thumbnailFile.name,
+          contentType: thumbnailFile.type || "image/jpeg",
+          kind: "thumbnail"
+        })
+      });
+
+      if (!signedThumbResponse.ok) {
+        const payload = (await signedThumbResponse.json().catch(() => ({}))) as { error?: string };
+        setIsLoading(false);
+        setUploadProgress(null);
+        setUploadStep("");
+        setError(payload.error ?? "Preparation miniature impossible");
+        return;
+      }
+
+      const signedThumbPayload = (await signedThumbResponse.json()) as {
+        key: string;
+        uploadUrl: string;
+        headers?: Record<string, string>;
+      };
+
+      try {
+        await uploadFileWithProgress(signedThumbPayload.uploadUrl, thumbnailFile, signedThumbPayload.headers);
+      } catch (thumbError) {
+        const message = thumbError instanceof Error ? thumbError.message : "Upload miniature impossible";
+        setIsLoading(false);
+        setUploadProgress(null);
+        setUploadStep("");
+        setError(message);
+        return;
+      }
+
+      formData.delete("thumbnailFile");
+      formData.set("thumbnailR2Key", signedThumbPayload.key);
+    }
+
+    const payload = {
+      title: String(formData.get("title") ?? "").trim(),
+      category: String(formData.get("category") ?? "").trim(),
+      description: String(formData.get("description") ?? "").trim(),
+      level: String(formData.get("level") ?? "").trim(),
+      durationMin: Number(formData.get("durationMin") ?? 0),
+      priceCents: Number(formData.get("priceCents") ?? 0),
+      thumbnail: String(formData.get("thumbnail") ?? "").trim(),
+      videoR2Key: String(formData.get("videoR2Key") ?? "").trim(),
+      thumbnailR2Key: String(formData.get("thumbnailR2Key") ?? "").trim()
+    };
+
     const response = await fetch("/api/coach/videos", {
       method: "POST",
-      body: formData
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
 
     setIsLoading(false);
