@@ -13,11 +13,17 @@ export function CoachUploadForm() {
   const [uploadStep, setUploadStep] = useState("");
   const [priceEuros, setPriceEuros] = useState("");
 
-  function uploadFileWithProgress(uploadUrl: string, file: File) {
+  function uploadFileWithProgress(uploadUrl: string, file: File, headers?: Record<string, string>) {
     return new Promise<void>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("PUT", uploadUrl);
-      xhr.setRequestHeader("Content-Type", file.type || "video/mp4");
+      if (headers) {
+        for (const [name, value] of Object.entries(headers)) {
+          xhr.setRequestHeader(name, value);
+        }
+      } else {
+        xhr.setRequestHeader("Content-Type", file.type || "video/mp4");
+      }
 
       xhr.upload.onprogress = (event) => {
         if (!event.lengthComputable) {
@@ -84,18 +90,23 @@ export function CoachUploadForm() {
 
     if (signedUploadResponse.ok) {
       setUploadStep("Preparation de l'upload...");
-      const signedPayload = (await signedUploadResponse.json()) as { key: string; uploadUrl: string };
+      const signedPayload = (await signedUploadResponse.json()) as {
+        key: string;
+        uploadUrl: string;
+        headers?: Record<string, string>;
+      };
 
       setUploadStep("Envoi de la video...");
       setUploadProgress(0);
 
       try {
-        await uploadFileWithProgress(signedPayload.uploadUrl, videoFile);
-      } catch {
+        await uploadFileWithProgress(signedPayload.uploadUrl, videoFile, signedPayload.headers);
+      } catch (uploadError) {
         setIsLoading(false);
         setUploadProgress(null);
         setUploadStep("");
-        setError("Upload video R2 impossible");
+        const message = uploadError instanceof Error ? uploadError.message : "Upload video R2 impossible";
+        setError(`${message}. Verifie la config CORS du bucket R2 (PUT, OPTIONS, origin du site).`);
         return;
       }
 

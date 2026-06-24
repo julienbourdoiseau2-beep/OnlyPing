@@ -48,5 +48,12 @@ export async function POST(request: Request) {
     expiresInSeconds: 300
   });
 
-  return NextResponse.json({ key, uploadUrl });
+  return NextResponse.json({
+    key,
+    uploadUrl,
+    headers: {
+      "Content-Type": parsed.data.contentType,
+      "Cache-Control": "private, max-age=0, no-store"
+    }
+  });
 }
