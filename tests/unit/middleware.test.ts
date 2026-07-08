@@ -77,6 +77,15 @@ describe("middleware: authenticated but unverified email", () => {
     expect(response.status).toBe(200);
   });
 
+  it.each(["/login", "/register", "/forgot-password", "/reset-password"])(
+    "lets an unverified user reach the auth page %s (e.g. to log in as a different account)",
+    async (path) => {
+      getToken.mockResolvedValue(unverifiedToken);
+      const response = await middleware(makeRequest(path));
+      expect(response.status).toBe(200);
+    }
+  );
+
   it.each(["/api/auth/verify-code", "/api/auth/resend-verification", "/api/auth/register", "/api/auth/session"])(
     "lets an unverified user call the auth endpoint %s",
     async (path) => {

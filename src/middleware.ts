@@ -18,9 +18,18 @@ const AUTH_REQUIRED_PATTERNS = [
 ];
 
 // Routes an authenticated-but-unverified user must still be able to reach:
-// the verification page itself, and every auth endpoint (login/logout,
-// register, password reset, resend code, code check).
-const VERIFICATION_EXEMPT_PATTERNS = [/^\/verify-email$/, /^\/api\/auth\/.*$/];
+// the verification page itself, every auth page (so they can log out and
+// back in as a different account, register another one, or reset a
+// password), and every auth API endpoint (login/logout, register, password
+// reset, resend code, code check).
+const VERIFICATION_EXEMPT_PATTERNS = [
+  /^\/verify-email$/,
+  /^\/login$/,
+  /^\/register$/,
+  /^\/forgot-password$/,
+  /^\/reset-password$/,
+  /^\/api\/auth\/.*$/
+];
 
 function matches(pathname: string, patterns: RegExp[]) {
   return patterns.some((pattern) => pattern.test(pathname));
