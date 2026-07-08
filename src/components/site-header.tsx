@@ -56,6 +56,9 @@ export function SiteHeader() {
               <Link href="/admin/utilisateurs" className="hover:text-white">
                 Admin utilisateurs
               </Link>
+              <Link href="/admin/coach-requests" className="hover:text-white">
+                Demandes coach
+              </Link>
             </>
           ) : null}
 
@@ -117,6 +120,13 @@ export function SiteHeader() {
                   onClick={closeMobileMenu}
                 >
                   Admin utilisateurs
+                </Link>
+                <Link
+                  href="/admin/coach-requests"
+                  className="rounded px-2 py-2 hover:bg-white/10"
+                  onClick={closeMobileMenu}
+                >
+                  Demandes coach
                 </Link>
               </>
             ) : null}

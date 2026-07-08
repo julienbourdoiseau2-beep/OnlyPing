@@ -7,6 +7,7 @@ const AUTH_REQUIRED_PATTERNS = [
   /^\/mes-achats$/,
   /^\/profil$/,
   /^\/devenir-coach$/,
+  /^\/coach(?:\/.*)?$/,
   /^\/admin(?:\/.*)?$/,
   /^\/api\/admin(?:\/.*)?$/,
   /^\/api\/checkout$/,

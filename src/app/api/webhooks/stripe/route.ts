@@ -51,7 +51,10 @@ export async function POST(request: Request) {
       });
 
       if (video) {
-        const commissionBps = getEffectiveCommissionBps(video.commissionBpsOverride, video.coach.commissionBps);
+        const metadataCommissionBps = Number(checkoutSession.metadata?.commissionBps);
+        const commissionBps = Number.isInteger(metadataCommissionBps)
+          ? metadataCommissionBps
+          : getEffectiveCommissionBps(video.commissionBpsOverride, video.coach.commissionBps);
         const { commissionAmount, coachNetAmount } = computeCommissionAmounts(video.priceCents, commissionBps);
 
         try {
@@ -72,6 +75,19 @@ export async function POST(request: Request) {
         }
       }
     }
+  }
+
+  if (event.type === "account.updated") {
+    const account = event.data.object as Stripe.Account;
+
+    await prisma.coachStripeAccount.updateMany({
+      where: { stripeConnectId: account.id },
+      data: {
+        stripeChargesEnabled: Boolean(account.charges_enabled),
+        stripePayoutsEnabled: Boolean(account.payouts_enabled),
+        stripeDetailsSubmitted: Boolean(account.details_submitted)
+      }
+    });
   }
 
   return NextResponse.json({ received: true });

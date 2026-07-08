@@ -12,7 +12,7 @@ export function getStripeServerClient() {
     throw new Error("STRIPE_SECRET_KEY invalide: format attendu sk_test_... ou sk_live_...");
   }
 
-  if (/\*|example|changeme|your_|_here|ekey/i.test(secretKey)) {
+  if (/\*|example|changeme|your_|_here|ekey|xxx/i.test(secretKey)) {
     throw new Error("STRIPE_SECRET_KEY invalide: valeur de demonstration detectee");
   }
 

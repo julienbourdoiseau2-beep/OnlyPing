@@ -23,9 +23,10 @@ type CoachVideoMobileItem = {
 type CoachVideosMobileManagerProps = {
   videos: CoachVideoMobileItem[];
   coachCommissionBps: number | null;
+  canPublish: boolean;
 };
 
-export function CoachVideosMobileManager({ videos, coachCommissionBps }: CoachVideosMobileManagerProps) {
+export function CoachVideosMobileManager({ videos, coachCommissionBps, canPublish }: CoachVideosMobileManagerProps) {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   const selectedVideo = useMemo(
@@ -108,7 +109,11 @@ export function CoachVideosMobileManager({ videos, coachCommissionBps }: CoachVi
                 initialThumbnail={selectedVideo.thumbnail}
                 effectiveCommissionBps={getEffectiveCommissionBps(selectedVideo.commissionBpsOverride, coachCommissionBps)}
               />
-              <PublishToggleButton videoId={selectedVideo.id} isPublished={selectedVideo.isPublished} />
+              <PublishToggleButton
+                videoId={selectedVideo.id}
+                isPublished={selectedVideo.isPublished}
+                canPublish={canPublish}
+              />
               <DeleteVideoButton videoId={selectedVideo.id} title={selectedVideo.title} />
             </div>
           </div>

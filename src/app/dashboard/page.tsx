@@ -8,6 +8,7 @@ import { CoachVideoSettingsForm } from "@/components/coach-video-settings-form";
 import { CoachVideosMobileManager } from "@/components/coach-videos-mobile-manager";
 import { DeleteVideoButton } from "@/components/delete-video-button";
 import { PublishToggleButton } from "@/components/publish-toggle-button";
+import { RestartOnboardingButton } from "@/components/restart-onboarding-button";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -30,7 +31,7 @@ export default async function DashboardPage() {
     );
   }
 
-  const [videos, coach, purchases] = await Promise.all([
+  const [videos, coach, coachStripeAccount, purchases] = await Promise.all([
     prisma.video.findMany({
       where: { coachId: session.user.id, deletedAt: null },
       orderBy: { createdAt: "desc" }
@@ -38,6 +39,10 @@ export default async function DashboardPage() {
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: { commissionBps: true }
+    }),
+    prisma.coachStripeAccount.findUnique({
+      where: { userId: session.user.id },
+      select: { stripeChargesEnabled: true, stripePayoutsEnabled: true, stripeDetailsSubmitted: true }
     }),
     prisma.purchase.findMany({
       where: {
@@ -65,6 +70,7 @@ export default async function DashboardPage() {
     })
   ]);
   const coachCommissionBps = coach?.commissionBps ?? null;
+  const canPublish = Boolean(coachStripeAccount?.stripeChargesEnabled && coachStripeAccount?.stripePayoutsEnabled);
 
   let grossCents = 0;
   let commissionCents = 0;
@@ -102,6 +108,19 @@ export default async function DashboardPage() {
       <h1 className="text-4xl font-bold">Espace entraineur</h1>
       <p className="mt-2 text-[#b8c1cd]">Bienvenue {session.user.name}, voici tes videos.</p>
 
+      {!canPublish ? (
+        <div className="mt-6 rounded-2xl border border-[#ff8c42]/30 bg-[#ff8c42]/10 p-5">
+          <p className="text-sm font-semibold text-[#ff8c42]">Compte de paiement a configurer</p>
+          <p className="mt-1 text-sm text-[#b8c1cd]">
+            Publier une video necessite un compte de paiement Stripe pleinement active (paiements entrants et
+            versements). Configure-le pour pouvoir publier tes videos et recevoir tes gains.
+          </p>
+          <div className="mt-3 max-w-xs">
+            <RestartOnboardingButton />
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-6 grid gap-4 sm:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
           <p className="text-sm text-[#94a3b8]">Ventes</p>
@@ -120,6 +139,11 @@ export default async function DashboardPage() {
           <p className="mt-2 text-3xl font-bold text-[#e2e8f0]">{(netCents / 100).toFixed(2)} EUR</p>
         </div>
       </div>
+
+      <p className="mt-3 text-xs text-[#8b949e]">
+        Ta part est versee automatiquement sur ton compte Stripe a chaque vente, au taux de commission indique pour
+        chaque video ci-dessous.
+      </p>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
         <table className="min-w-full text-left text-sm">
@@ -171,6 +195,7 @@ export default async function DashboardPage() {
             commissionBpsOverride: video.commissionBpsOverride
           }))}
           coachCommissionBps={coachCommissionBps}
+          canPublish={canPublish}
         />
       </div>
 
@@ -211,7 +236,7 @@ export default async function DashboardPage() {
                       initialThumbnail={video.thumbnail}
                       effectiveCommissionBps={getEffectiveCommissionBps(video.commissionBpsOverride, coachCommissionBps)}
                     />
-                    <PublishToggleButton videoId={video.id} isPublished={video.isPublished} />
+                    <PublishToggleButton videoId={video.id} isPublished={video.isPublished} canPublish={canPublish} />
                     <DeleteVideoButton videoId={video.id} title={video.title} />
                   </td>
                 </tr>

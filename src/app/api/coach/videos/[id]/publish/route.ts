@@ -33,6 +33,23 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Acces refuse" }, { status: 403 });
   }
 
+  if (payload.isPublished) {
+    const coachStripeAccount = await prisma.coachStripeAccount.findUnique({
+      where: { userId: video.coachId },
+      select: { stripeChargesEnabled: true, stripePayoutsEnabled: true }
+    });
+
+    if (!coachStripeAccount?.stripeChargesEnabled || !coachStripeAccount.stripePayoutsEnabled) {
+      return NextResponse.json(
+        {
+          error: "Configure ton compte de paiement avant de publier une video.",
+          onboardingUrl: "/api/coach/stripe/onboard"
+        },
+        { status: 403 }
+      );
+    }
+  }
+
   const updated = await prisma.video.update({
     where: { id: video.id },
     data: { isPublished: payload.isPublished },

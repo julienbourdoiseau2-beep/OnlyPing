@@ -1,4 +1,5 @@
 import { authOptions } from "@/lib/auth";
+import { computeCommissionAmounts, getEffectiveCommissionBps } from "@/lib/commission";
 import { prisma } from "@/lib/prisma";
 import { getStripeServerClient } from "@/lib/stripe";
 import { getServerSession } from "next-auth";
@@ -23,11 +24,37 @@ export async function POST(request: Request) {
 
   const video = await prisma.video.findUnique({
     where: { id: parsed.data.videoId },
-    include: { coach: { select: { name: true } } }
+    include: {
+      coach: {
+        select: {
+          name: true,
+          commissionBps: true,
+          coachStripeAccount: {
+            select: {
+              stripeConnectId: true,
+              stripeChargesEnabled: true,
+              stripePayoutsEnabled: true
+            }
+          }
+        }
+      }
+    }
   });
 
   if (!video || !video.isPublished) {
     return NextResponse.json({ error: "Video introuvable" }, { status: 404 });
+  }
+
+  const coachStripeAccount = video.coach.coachStripeAccount;
+  if (
+    !coachStripeAccount?.stripeConnectId ||
+    !coachStripeAccount.stripeChargesEnabled ||
+    !coachStripeAccount.stripePayoutsEnabled
+  ) {
+    return NextResponse.json(
+      { error: "Ce coach n'a pas encore de compte de paiement pleinement configure. Achat impossible pour le moment." },
+      { status: 409 }
+    );
   }
 
   const existing = await prisma.purchase.findUnique({
@@ -43,6 +70,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Video deja achetee" }, { status: 409 });
   }
 
+  const commissionBps = getEffectiveCommissionBps(video.commissionBpsOverride, video.coach.commissionBps);
+  const { commissionAmount } = computeCommissionAmounts(video.priceCents, commissionBps);
+
   try {
     const stripe = getStripeServerClient();
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
@@ -54,7 +84,14 @@ export async function POST(request: Request) {
       customer_email: session.user.email ?? undefined,
       metadata: {
         userId: session.user.id,
-        videoId: video.id
+        videoId: video.id,
+        commissionBps: String(commissionBps)
+      },
+      payment_intent_data: {
+        application_fee_amount: commissionAmount,
+        transfer_data: {
+          destination: coachStripeAccount.stripeConnectId
+        }
       },
       line_items: [
         {
