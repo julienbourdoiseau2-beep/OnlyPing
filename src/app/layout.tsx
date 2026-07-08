@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -18,7 +18,6 @@ const bodyFont = Poppins({
 export const metadata: Metadata = {
   title: "OnlyPing - Videos techniques de ping-pong",
   description: "Plateforme de videos techniques de ping-pong alimentee par des entraineurs.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -28,7 +27,6 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false
   },
-  themeColor: "#1f6feb",
   icons: {
     icon: [
       { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
@@ -38,6 +36,13 @@ export const metadata: Metadata = {
       { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" }
     ]
   }
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#1f6feb"
 };
 
 export default function RootLayout({

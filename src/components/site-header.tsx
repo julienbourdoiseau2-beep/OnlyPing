@@ -43,6 +43,11 @@ export function SiteHeader() {
           <Link href="/dashboard" className="hover:text-white">
             Espace coach
           </Link>
+          {session?.user ? (
+            <Link href="/devenir-coach" className="hover:text-white">
+              Devenir coach
+            </Link>
+          ) : null}
           {session?.user?.role === "ADMIN" ? (
             <>
               <Link href="/admin/achats" className="hover:text-white">
@@ -95,6 +100,11 @@ export function SiteHeader() {
             <Link href="/dashboard" className="rounded px-2 py-2 hover:bg-white/10" onClick={closeMobileMenu}>
               Espace coach
             </Link>
+            {session?.user ? (
+              <Link href="/devenir-coach" className="rounded px-2 py-2 hover:bg-white/10" onClick={closeMobileMenu}>
+                Devenir coach
+              </Link>
+            ) : null}
 
             {session?.user?.role === "ADMIN" ? (
               <>

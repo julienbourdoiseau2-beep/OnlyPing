@@ -59,23 +59,39 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          role
+          role,
+          emailVerified: user.emailVerified
         };
       }
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.emailVerified = Boolean((user as { emailVerified?: boolean }).emailVerified);
       }
+
+      if (trigger === "update" && token.id) {
+        const freshUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { role: true, emailVerified: true }
+        });
+
+        if (freshUser) {
+          token.role = toAppRole(freshUser.role) ?? token.role;
+          token.emailVerified = freshUser.emailVerified;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as "USER" | "COACH" | "ADMIN";
+        session.user.emailVerified = Boolean(token.emailVerified);
       }
       return session;
     }

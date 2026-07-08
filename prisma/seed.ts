@@ -16,6 +16,7 @@ async function main() {
       email: "coach@onlyping.fr",
       passwordHash: coachPassword,
       role: "COACH",
+      emailVerified: true,
       coachProfile: {
         create: {
           bio: "Ancien joueur national, specialise topspin et jeu de jambes.",
@@ -33,7 +34,8 @@ async function main() {
       name: "Emma Dubois",
       email: "user@onlyping.fr",
       passwordHash: userPassword,
-      role: "USER"
+      role: "USER",
+      emailVerified: true
     }
   });
 
@@ -44,7 +46,8 @@ async function main() {
       name: "Admin OnlyPing",
       email: "admin@onlyping.fr",
       passwordHash: adminPassword,
-      role: "ADMIN"
+      role: "ADMIN",
+      emailVerified: true
     }
   });
 

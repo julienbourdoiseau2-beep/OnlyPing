@@ -3,69 +3,89 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id           String        @id @default(cuid())
-  name         String
-  email        String        @unique
-  avatarUrl    String?
-  passwordHash String
-  role         String        @default("USER")
-  commissionBps Int?
-  createdAt    DateTime      @default(now())
-  coachProfile CoachProfile?
-  purchases    Purchase[]
-  reviews      Review[]
-  videos       Video[]       @relation("CoachVideos")
+  id                      String         @id @default(cuid())
+  name                    String
+  email                   String         @unique
+  avatarUrl               String?
+  passwordHash            String
+  role                    String         @default("USER")
+  commissionBps           Int?
+  createdAt               DateTime       @default(now())
+  emailVerified           Boolean        @default(false)
+  resetToken              String?        @unique
+  resetTokenExpiry        DateTime?
+  verificationCode        String?
+  verificationCodeExpiry  DateTime?
+  coachProfile            CoachProfile?
+  coachRequests           CoachRequest[]
+  purchases               Purchase[]
+  reviews                 Review[]
+  videos                  Video[]        @relation("CoachVideos")
 }
 
 model CoachProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
+  id          String @id @default(cuid())
+  userId      String @unique
   bio         String
   specialty   String
   yearsActive Int
-  user        User     @relation(fields: [userId], references: [id])
+  user        User   @relation(fields: [userId], references: [id])
 }
 
 model Video {
-  id          String     @id @default(cuid())
-  title       String
-  slug        String     @unique
-  description String
-  category    String     @default("SERVICE")
-  level       String
-  durationMin Int
-  priceCents  Int
-  thumbnail   String
-  videoUrl    String
+  id                    String     @id @default(cuid())
+  title                 String
+  slug                  String     @unique
+  description           String
+  category              String     @default("SERVICE")
+  level                 String
+  durationMin           Int
+  priceCents            Int
+  thumbnail             String
+  videoUrl              String
   commissionBpsOverride Int?
-  isPublished Boolean    @default(false)
-  deletedAt   DateTime?
-  createdAt   DateTime   @default(now())
-  coachId     String
-  coach       User       @relation("CoachVideos", fields: [coachId], references: [id])
-  purchases   Purchase[]
-  reviews     Review[]
+  isPublished           Boolean    @default(false)
+  createdAt             DateTime   @default(now())
+  coachId               String
+  deletedAt             DateTime?
+  purchases             Purchase[]
+  reviews               Review[]
+  coach                 User       @relation("CoachVideos", fields: [coachId], references: [id])
 }
 
 model Purchase {
-  id        String   @id @default(cuid())
-  userId    String
-  videoId   String
-  amount    Int
+  id                      String   @id @default(cuid())
+  userId                  String
+  videoId                 String
+  amount                  Int
   commissionBpsAtPurchase Int?
-  commissionAmount Int?
-  coachNetAmount Int?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  video     Video    @relation(fields: [videoId], references: [id])
+  commissionAmount        Int?
+  coachNetAmount          Int?
+  createdAt               DateTime @default(now())
+  user                    User     @relation(fields: [userId], references: [id])
+  video                   Video    @relation(fields: [videoId], references: [id])
 
   @@unique([userId, videoId])
+}
+
+model CoachRequest {
+  id               String    @id @default(cuid())
+  userId           String
+  status           String    @default("PENDING")
+  fullName         String
+  address          String
+  phone            String
+  ibanOrStripeInfo String
+  message          String?
+  createdAt        DateTime  @default(now())
+  reviewedAt       DateTime?
+  user             User      @relation(fields: [userId], references: [id])
 }
 
 model Review {

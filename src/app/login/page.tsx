@@ -67,7 +67,7 @@ function LoginPageContent() {
         </label>
 
         <p className="text-right text-sm">
-          <Link className="text-[#cfd6df] hover:text-white" href="/mot-de-passe-oublie">
+          <Link className="text-[#cfd6df] hover:text-white" href="/forgot-password">
             Mot de passe oublie ?
           </Link>
         </p>

@@ -53,7 +53,7 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push("/mes-achats");
+    router.push("/verify-email?sent=1");
     router.refresh();
   }
 

@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { matchesPasswordSignature, parseAndVerifyPasswordResetToken } from "@/lib/password-reset";
 import { checkRateLimit } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
@@ -21,17 +20,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Payload invalide" }, { status: 400 });
   }
 
-  const tokenData = parseAndVerifyPasswordResetToken(parsed.data.token);
-  if (!tokenData) {
-    return NextResponse.json({ error: "Lien invalide ou expire" }, { status: 400 });
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: tokenData.userId },
-    select: { id: true, passwordHash: true }
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: parsed.data.token,
+      resetTokenExpiry: { gt: new Date() }
+    },
+    select: { id: true }
   });
 
-  if (!user || !matchesPasswordSignature(user.passwordHash, tokenData.pwdSig)) {
+  if (!user) {
     return NextResponse.json({ error: "Lien invalide ou expire" }, { status: 400 });
   }
 
@@ -39,7 +36,11 @@ export async function POST(request: Request) {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash }
+    data: {
+      passwordHash,
+      resetToken: null,
+      resetTokenExpiry: null
+    }
   });
 
   return NextResponse.json({ ok: true });

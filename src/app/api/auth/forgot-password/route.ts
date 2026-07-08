@@ -1,19 +1,16 @@
 import { prisma } from "@/lib/prisma";
-import { createPasswordResetToken } from "@/lib/password-reset";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import crypto from "crypto";
+import { sendEmail } from "@/lib/email";
 
 const bodySchema = z.object({
   email: z.string().email()
 });
 
 function getBaseUrl() {
-  return (
-    process.env.NEXTAUTH_URL ??
-    process.env.APP_URL ??
-    "http://localhost:3000"
-  );
+  return process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 }
 
 export async function POST(request: Request) {
@@ -31,22 +28,31 @@ export async function POST(request: Request) {
 
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, passwordHash: true }
+    select: { id: true, email: true, name: true }
   });
 
-  // Response is intentionally generic to avoid account enumeration.
   if (!user) {
     return NextResponse.json({ ok: true });
   }
 
-  const token = createPasswordResetToken(user.id, user.passwordHash);
-  const resetUrl = `${getBaseUrl()}/reset-password?token=${encodeURIComponent(token)}`;
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000);
 
-  if (process.env.NODE_ENV !== "production") {
-    console.info(`[password-reset] ${email} -> ${resetUrl}`);
-    return NextResponse.json({ ok: true, resetUrl });
-  }
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      resetToken,
+      resetTokenExpiry
+    }
+  });
 
-  // TODO: brancher un provider email transactionnel en production.
+  const resetUrl = `${getBaseUrl()}/reset-password?token=${encodeURIComponent(resetToken)}`;
+
+  await sendEmail({
+    to: user.email,
+    subject: "Réinitialise ton mot de passe OnlyPing",
+    html: `<p>Bonjour ${user.name || "there"},</p><p>Pour réinitialiser ton mot de passe, clique ici :</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>Ce lien expire dans 1h.</p>`
+  });
+
   return NextResponse.json({ ok: true });
 }
