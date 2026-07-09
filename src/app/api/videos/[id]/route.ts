@@ -10,7 +10,11 @@ type RouteContext = {
 export async function GET(_: Request, context: RouteContext) {
   const video = await prisma.video.findUnique({
     where: { id: context.params.id },
-    include: { coach: true }
+    include: {
+      coach: {
+        select: { id: true, name: true, avatarUrl: true }
+      }
+    }
   });
 
   if (!video || !video.isPublished || video.deletedAt) {

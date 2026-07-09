@@ -5,7 +5,11 @@ export async function GET() {
   try {
     const videos = await prisma.video.findMany({
       where: { isPublished: true, deletedAt: null },
-      include: { coach: true },
+      include: {
+        coach: {
+          select: { id: true, name: true, avatarUrl: true }
+        }
+      },
       orderBy: { createdAt: "desc" }
     });
 
