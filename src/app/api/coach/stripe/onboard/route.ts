@@ -18,8 +18,14 @@ export async function POST() {
     return NextResponse.json({ error: "Email de session manquant" }, { status: 400 });
   }
 
-  const url = await buildOnboardingUrl(session.user.id, session.user.email);
-  return NextResponse.json({ url });
+  try {
+    const url = await buildOnboardingUrl(session.user.id, session.user.email);
+    return NextResponse.json({ url });
+  } catch (error) {
+    console.error("coach-stripe-onboard-error", error);
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
+    return NextResponse.json({ error: `Impossible de generer le lien de configuration : ${message}` }, { status: 500 });
+  }
 }
 
 export async function GET() {
@@ -28,6 +34,11 @@ export async function GET() {
     return NextResponse.redirect(new URL("/login", getAppBaseUrl()));
   }
 
-  const url = await buildOnboardingUrl(session.user.id, session.user.email);
-  return NextResponse.redirect(url);
+  try {
+    const url = await buildOnboardingUrl(session.user.id, session.user.email);
+    return NextResponse.redirect(url);
+  } catch (error) {
+    console.error("coach-stripe-onboard-error", error);
+    return NextResponse.redirect(new URL("/dashboard?stripe_error=1", getAppBaseUrl()));
+  }
 }
