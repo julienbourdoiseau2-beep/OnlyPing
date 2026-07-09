@@ -30,12 +30,12 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Video introuvable" }, { status: 404 });
   }
 
-  const hasPurchased = await prisma.purchase.findUnique({
+  const hasPurchased = await prisma.purchase.findFirst({
     where: {
-      userId_videoId: {
-        userId: session.user.id,
-        videoId: video.id
-      }
+      userId: session.user.id,
+      videoId: video.id,
+      refundedAt: null,
+      disputedAt: null
     },
     select: { id: true }
   });

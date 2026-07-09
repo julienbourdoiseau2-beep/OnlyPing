@@ -8,9 +8,48 @@ const { userFindUnique, userUpdate } = vi.hoisted(() => ({
   userFindUnique: vi.fn(),
   userUpdate: vi.fn()
 }));
-vi.mock("@/lib/prisma", () => ({
-  prisma: { user: { findUnique: userFindUnique, update: userUpdate } }
-}));
+vi.mock("@/lib/prisma", () => {
+  type BucketRow = { key: string; count: number; resetAt: Date };
+  const rateLimitStore = new Map<string, BucketRow>();
+
+  return {
+    prisma: {
+      user: { findUnique: userFindUnique, update: userUpdate },
+      rateLimitBucket: {
+        findUnique: async ({ where: { key } }: { where: { key: string } }) => rateLimitStore.get(key) ?? null,
+        upsert: async ({
+          where: { key },
+          create,
+          update
+        }: {
+          where: { key: string };
+          create: BucketRow;
+          update: { count: number; resetAt: Date };
+        }) => {
+          const row: BucketRow = rateLimitStore.has(key) ? { key, count: update.count, resetAt: update.resetAt } : create;
+          rateLimitStore.set(key, row);
+          return row;
+        },
+        update: async ({
+          where: { key },
+          data
+        }: {
+          where: { key: string };
+          data: { count: { increment: number } };
+        }) => {
+          const row = rateLimitStore.get(key);
+          if (!row) {
+            throw new Error(`No bucket for key ${key}`);
+          }
+          row.count += data.count.increment;
+          rateLimitStore.set(key, row);
+          return row;
+        },
+        deleteMany: async () => ({ count: 0 })
+      }
+    }
+  };
+});
 
 const { POST } = await import("@/app/api/auth/verify-code/route");
 

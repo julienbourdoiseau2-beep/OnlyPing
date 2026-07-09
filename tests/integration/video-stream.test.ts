@@ -122,7 +122,7 @@ describe("GET /api/videos/[id]/stream - access control", () => {
     expect(videoFindUnique).toHaveBeenCalledWith(
       expect.objectContaining({
         select: expect.objectContaining({
-          purchases: { where: { userId: "buyer_1" }, select: { id: true } }
+          purchases: { where: { userId: "buyer_1", refundedAt: null, disputedAt: null }, select: { id: true } }
         })
       })
     );

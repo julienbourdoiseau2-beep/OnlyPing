@@ -5,6 +5,14 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import Stripe from "stripe";
 
+function resolveStripeId(value: string | { id: string } | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return typeof value === "string" ? value : value.id;
+}
+
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -65,7 +73,8 @@ export async function POST(request: Request) {
               amount: video.priceCents,
               commissionBpsAtPurchase: commissionBps,
               commissionAmount,
-              coachNetAmount
+              coachNetAmount,
+              stripePaymentIntentId: resolveStripeId(checkoutSession.payment_intent)
             }
           });
         } catch (error) {
@@ -73,6 +82,49 @@ export async function POST(request: Request) {
             throw error;
           }
         }
+      }
+    }
+  }
+
+  if (event.type === "charge.refunded") {
+    const charge = event.data.object as Stripe.Charge;
+    const paymentIntentId = resolveStripeId(charge.payment_intent);
+
+    if (paymentIntentId) {
+      await prisma.purchase.updateMany({
+        where: { stripePaymentIntentId: paymentIntentId, refundedAt: null },
+        data: { refundedAt: new Date() }
+      });
+    }
+  }
+
+  if (event.type === "charge.dispute.created") {
+    const dispute = event.data.object as Stripe.Dispute;
+    const paymentIntentId = resolveStripeId(dispute.payment_intent);
+
+    if (paymentIntentId) {
+      await prisma.purchase.updateMany({
+        where: { stripePaymentIntentId: paymentIntentId, disputedAt: null },
+        data: { disputedAt: new Date() }
+      });
+    }
+  }
+
+  if (event.type === "charge.dispute.closed") {
+    const dispute = event.data.object as Stripe.Dispute;
+    const paymentIntentId = resolveStripeId(dispute.payment_intent);
+
+    if (paymentIntentId) {
+      if (dispute.status === "won") {
+        await prisma.purchase.updateMany({
+          where: { stripePaymentIntentId: paymentIntentId },
+          data: { disputedAt: null }
+        });
+      } else if (dispute.status === "lost") {
+        await prisma.purchase.updateMany({
+          where: { stripePaymentIntentId: paymentIntentId, refundedAt: null },
+          data: { refundedAt: new Date() }
+        });
       }
     }
   }

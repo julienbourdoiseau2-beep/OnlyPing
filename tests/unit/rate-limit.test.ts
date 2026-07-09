@@ -1,5 +1,51 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { checkRateLimit } from "@/lib/rate-limit";
+
+type BucketRow = { key: string; count: number; resetAt: Date };
+
+// Fake Postgres-backed store: mirrors the semantics rate-limit.ts relies on
+// (findUnique/upsert/update), without needing a real database in unit tests.
+vi.mock("@/lib/prisma", () => {
+  const store = new Map<string, BucketRow>();
+
+  return {
+    prisma: {
+      rateLimitBucket: {
+        findUnique: async ({ where: { key } }: { where: { key: string } }) => store.get(key) ?? null,
+        upsert: async ({
+          where: { key },
+          create,
+          update
+        }: {
+          where: { key: string };
+          create: BucketRow;
+          update: { count: number; resetAt: Date };
+        }) => {
+          const row: BucketRow = store.has(key) ? { key, count: update.count, resetAt: update.resetAt } : create;
+          store.set(key, row);
+          return row;
+        },
+        update: async ({
+          where: { key },
+          data
+        }: {
+          where: { key: string };
+          data: { count: { increment: number } };
+        }) => {
+          const row = store.get(key);
+          if (!row) {
+            throw new Error(`No bucket for key ${key}`);
+          }
+          row.count += data.count.increment;
+          store.set(key, row);
+          return row;
+        },
+        deleteMany: async () => ({ count: 0 })
+      }
+    }
+  };
+});
+
+const { checkRateLimit } = await import("@/lib/rate-limit");
 
 function requestFrom(ip: string | null) {
   const headers = new Headers();
@@ -19,93 +65,98 @@ describe("checkRateLimit", () => {
     vi.useRealTimers();
   });
 
-  it("allows requests up to max within the window, then blocks", () => {
+  it("allows requests up to max within the window, then blocks", async () => {
     const scope = "test-scope-basic";
     const request = requestFrom("1.1.1.1");
     const options = { windowMs: 60_000, max: 3 };
 
-    expect(checkRateLimit(request, scope, options).ok).toBe(true);
-    expect(checkRateLimit(request, scope, options).ok).toBe(true);
-    expect(checkRateLimit(request, scope, options).ok).toBe(true);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(true);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(true);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(true);
 
-    const fourth = checkRateLimit(request, scope, options);
+    const fourth = await checkRateLimit(request, scope, options);
     expect(fourth.ok).toBe(false);
     expect(fourth.remaining).toBe(0);
   });
 
-  it("reports decreasing remaining count as requests are consumed", () => {
+  it("reports decreasing remaining count as requests are consumed", async () => {
     const scope = "test-scope-remaining";
     const request = requestFrom("1.1.1.2");
     const options = { windowMs: 60_000, max: 3 };
 
-    expect(checkRateLimit(request, scope, options).remaining).toBe(2);
-    expect(checkRateLimit(request, scope, options).remaining).toBe(1);
-    expect(checkRateLimit(request, scope, options).remaining).toBe(0);
+    expect((await checkRateLimit(request, scope, options)).remaining).toBe(2);
+    expect((await checkRateLimit(request, scope, options)).remaining).toBe(1);
+    expect((await checkRateLimit(request, scope, options)).remaining).toBe(0);
   });
 
-  it("resets the counter once the window has elapsed", () => {
+  it("resets the counter once the window has elapsed", async () => {
     const scope = "test-scope-reset";
     const request = requestFrom("1.1.1.3");
     const options = { windowMs: 60_000, max: 1 };
 
-    expect(checkRateLimit(request, scope, options).ok).toBe(true);
-    expect(checkRateLimit(request, scope, options).ok).toBe(false);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(true);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(false);
 
     vi.advanceTimersByTime(60_001);
 
-    expect(checkRateLimit(request, scope, options).ok).toBe(true);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(true);
   });
 
-  it("keeps separate buckets per scope for the same IP", () => {
+  it("keeps separate buckets per scope for the same IP", async () => {
     const request = requestFrom("1.1.1.4");
     const options = { windowMs: 60_000, max: 1 };
 
-    expect(checkRateLimit(request, "scope-a", options).ok).toBe(true);
+    expect((await checkRateLimit(request, "scope-a", options)).ok).toBe(true);
     // A different scope (different route) must not be affected by scope-a's usage.
-    expect(checkRateLimit(request, "scope-b", options).ok).toBe(true);
+    expect((await checkRateLimit(request, "scope-b", options)).ok).toBe(true);
     // scope-a is now exhausted regardless of scope-b's state.
-    expect(checkRateLimit(request, "scope-a", options).ok).toBe(false);
+    expect((await checkRateLimit(request, "scope-a", options)).ok).toBe(false);
   });
 
-  it("keeps separate buckets per IP for the same scope", () => {
+  it("keeps separate buckets per IP for the same scope", async () => {
     const scope = "test-scope-per-ip";
     const options = { windowMs: 60_000, max: 1 };
 
-    expect(checkRateLimit(requestFrom("2.2.2.1"), scope, options).ok).toBe(true);
-    expect(checkRateLimit(requestFrom("2.2.2.2"), scope, options).ok).toBe(true);
-    expect(checkRateLimit(requestFrom("2.2.2.1"), scope, options).ok).toBe(false);
+    expect((await checkRateLimit(requestFrom("2.2.2.1"), scope, options)).ok).toBe(true);
+    expect((await checkRateLimit(requestFrom("2.2.2.2"), scope, options)).ok).toBe(true);
+    expect((await checkRateLimit(requestFrom("2.2.2.1"), scope, options)).ok).toBe(false);
   });
 
-  it("uses the first address in a comma-separated x-forwarded-for header", () => {
+  it("uses the first address in a comma-separated x-forwarded-for header", async () => {
     const scope = "test-scope-xff-list";
     const options = { windowMs: 60_000, max: 1 };
     const headers = new Headers({ "x-forwarded-for": "3.3.3.3, 9.9.9.9" });
     const request = new Request("http://localhost/api/test", { headers });
 
-    expect(checkRateLimit(request, scope, options).ok).toBe(true);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(true);
     // Same first hop IP -> same bucket, should now be blocked.
     expect(
-      checkRateLimit(new Request("http://localhost/api/test", { headers: new Headers({ "x-forwarded-for": "3.3.3.3" }) }), scope, options)
-        .ok
+      (
+        await checkRateLimit(
+          new Request("http://localhost/api/test", { headers: new Headers({ "x-forwarded-for": "3.3.3.3" }) }),
+          scope,
+          options
+        )
+      ).ok
     ).toBe(false);
   });
 
-  it("falls back to x-real-ip when x-forwarded-for is absent", () => {
+  it("falls back to x-real-ip when x-forwarded-for is absent", async () => {
     const scope = "test-scope-real-ip";
     const options = { windowMs: 60_000, max: 1 };
     const request = new Request("http://localhost/api/test", { headers: new Headers({ "x-real-ip": "4.4.4.4" }) });
 
-    expect(checkRateLimit(request, scope, options).ok).toBe(true);
-    expect(checkRateLimit(request, scope, options).ok).toBe(false);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(true);
+    expect((await checkRateLimit(request, scope, options)).ok).toBe(false);
   });
 
-  it("falls back to a shared 'unknown' bucket when no IP header is present", () => {
+  it("falls back to a shared 'unknown' bucket when no IP header is present", async () => {
     const scope = "test-scope-unknown";
     const options = { windowMs: 60_000, max: 1 };
 
-    expect(checkRateLimit(requestFrom(null), scope, options).ok).toBe(true);
+    expect((await checkRateLimit(requestFrom(null), scope, options)).ok).toBe(true);
     // Two different clients with no IP headers share the same fallback bucket -
     // documenting current behavior so a future change here is a deliberate choice.
-    expect(checkRateLimit(requestFrom(null), scope, options).ok).toBe(false);
+    expect((await checkRateLimit(requestFrom(null), scope, options)).ok).toBe(false);
   });
 });

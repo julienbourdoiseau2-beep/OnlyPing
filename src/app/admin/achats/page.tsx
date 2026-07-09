@@ -108,6 +108,10 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
       : {})
   };
 
+  // Les remboursements/litiges restent visibles dans le tableau detaille (audit),
+  // mais sont exclus des totaux : cet argent n'est plus (ou pas encore) acquis.
+  const cleanWhere = { ...where, refundedAt: null, disputedAt: null };
+
   const coaches = await prisma.user.findMany({
     where: { role: { in: ["COACH", "ADMIN"] } },
     select: {
@@ -118,15 +122,16 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
     orderBy: { name: "asc" }
   });
 
-  const [totalPurchases, revenueAggregate] = await Promise.all([
+  const [totalPurchasesRaw, totalPurchasesClean, revenueAggregateClean] = await Promise.all([
     prisma.purchase.count({ where }),
+    prisma.purchase.count({ where: cleanWhere }),
     prisma.purchase.aggregate({
-      where,
+      where: cleanWhere,
       _sum: { amount: true }
     })
   ]);
 
-  const totalPages = Math.max(1, Math.ceil(totalPurchases / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(totalPurchasesRaw / PAGE_SIZE));
   const page = Math.min(currentPage, totalPages);
   const skip = (page - 1) * PAGE_SIZE;
 
@@ -171,11 +176,35 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
     take: 200
   });
 
+  // Totaux calcules sur l'ensemble filtre (pas seulement la page affichee), net des
+  // remboursements/litiges.
+  const cleanPurchasesForTotals = await prisma.purchase.findMany({
+    where: cleanWhere,
+    select: {
+      amount: true,
+      commissionAmount: true,
+      coachNetAmount: true,
+      commissionBpsAtPurchase: true,
+      video: {
+        select: {
+          commissionBpsOverride: true,
+          coach: {
+            select: {
+              id: true,
+              name: true,
+              commissionBps: true
+            }
+          }
+        }
+      }
+    }
+  });
+
   const coachTotalsMap = new Map<string, { coachName: string; gross: number; commission: number; net: number; sales: number }>();
   let totalCommissionCents = 0;
   let totalCoachNetCents = 0;
 
-  for (const purchase of purchases) {
+  for (const purchase of cleanPurchasesForTotals) {
     const bps =
       purchase.commissionBpsAtPurchase ??
       getEffectiveCommissionBps(purchase.video.commissionBpsOverride, purchase.video.coach.commissionBps);
@@ -205,7 +234,7 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
 
   const coachTotals = Array.from(coachTotalsMap.values()).sort((a, b) => b.gross - a.gross);
 
-  const totalRevenueCents = revenueAggregate._sum.amount ?? 0;
+  const totalRevenueCents = revenueAggregateClean._sum.amount ?? 0;
   const totalRevenueEur = (totalRevenueCents / 100).toFixed(2);
   const totalCommissionEur = (totalCommissionCents / 100).toFixed(2);
   const totalCoachNetEur = (totalCoachNetCents / 100).toFixed(2);
@@ -217,8 +246,8 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
 
       <div className="mt-6 grid gap-4 sm:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Achats</p>
-          <p className="mt-2 text-3xl font-bold">{totalPurchases}</p>
+          <p className="text-sm text-[#94a3b8]">Achats (hors rembourses/litiges)</p>
+          <p className="mt-2 text-3xl font-bold">{totalPurchasesClean}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
           <p className="text-sm text-[#94a3b8]">Chiffre d&apos;affaires</p>
@@ -327,7 +356,8 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
       </div>
 
       <p className="mt-4 text-sm text-[#b8c1cd]">
-        Page {page} sur {totalPages} ({purchases.length} achat(s) affiche(s))
+        Page {page} sur {totalPages} ({purchases.length} achat(s) affiche(s), {totalPurchasesRaw} au total sur ce
+        filtre)
       </p>
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
@@ -343,6 +373,7 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
               <th className="px-4 py-3">CA</th>
               <th className="px-4 py-3">Commission</th>
               <th className="px-4 py-3">Gain reel coach</th>
+              <th className="px-4 py-3">Statut</th>
             </tr>
           </thead>
           <tbody>
@@ -356,6 +387,12 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
                   ? { commissionAmount: purchase.commissionAmount, coachNetAmount: purchase.coachNetAmount }
                   : computeCommissionAmounts(purchase.amount, bps);
 
+              const status = purchase.refundedAt
+                ? { label: "Rembourse", className: "text-rose-300" }
+                : purchase.disputedAt
+                  ? { label: "Litige en cours", className: "text-[#ff8c42]" }
+                  : { label: "Paye", className: "text-emerald-300" };
+
               return (
                 <tr key={purchase.id} className="border-t border-white/10">
                   <td className="px-4 py-3">{new Date(purchase.createdAt).toLocaleDateString("fr-FR")}</td>
@@ -367,6 +404,7 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
                   <td className="px-4 py-3">{(purchase.amount / 100).toFixed(2)} EUR</td>
                   <td className="px-4 py-3">{(amounts.commissionAmount / 100).toFixed(2)} EUR</td>
                   <td className="px-4 py-3">{(amounts.coachNetAmount / 100).toFixed(2)} EUR</td>
+                  <td className={`px-4 py-3 font-semibold ${status.className}`}>{status.label}</td>
                 </tr>
               );
             })}

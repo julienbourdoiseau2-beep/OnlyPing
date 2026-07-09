@@ -1,15 +1,16 @@
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { Prisma } from "@prisma/client";
 
-const { videoFindUnique, purchaseCreate, coachStripeAccountUpdateMany } = vi.hoisted(() => ({
+const { videoFindUnique, purchaseCreate, purchaseUpdateMany, coachStripeAccountUpdateMany } = vi.hoisted(() => ({
   videoFindUnique: vi.fn(),
   purchaseCreate: vi.fn(),
+  purchaseUpdateMany: vi.fn(),
   coachStripeAccountUpdateMany: vi.fn()
 }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     video: { findUnique: videoFindUnique },
-    purchase: { create: purchaseCreate },
+    purchase: { create: purchaseCreate, updateMany: purchaseUpdateMany },
     coachStripeAccount: { updateMany: coachStripeAccountUpdateMany }
   }
 }));
@@ -36,6 +37,7 @@ beforeEach(() => {
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
   videoFindUnique.mockReset();
   purchaseCreate.mockReset();
+  purchaseUpdateMany.mockReset();
   coachStripeAccountUpdateMany.mockReset();
   constructEvent.mockReset();
   getStripeServerClient.mockReset();
@@ -80,6 +82,7 @@ describe("POST /api/webhooks/stripe", () => {
       data: {
         object: {
           payment_status: "paid",
+          payment_intent: "pi_test_123",
           metadata: { userId: "user_1", videoId: "video_1", commissionBps: "1000" }
         }
       }
@@ -102,7 +105,8 @@ describe("POST /api/webhooks/stripe", () => {
         amount: 2490,
         commissionBpsAtPurchase: 1000,
         commissionAmount: 249,
-        coachNetAmount: 2241
+        coachNetAmount: 2241,
+        stripePaymentIntentId: "pi_test_123"
       }
     });
   });
@@ -197,6 +201,77 @@ describe("POST /api/webhooks/stripe", () => {
 
     const response = await POST(request("{}"));
     expect(response.status).toBe(200);
+  });
+
+  it("marks the matching Purchase as refunded on charge.refunded", async () => {
+    constructEvent.mockReturnValue({
+      type: "charge.refunded",
+      data: { object: { payment_intent: "pi_test_123" } }
+    });
+    purchaseUpdateMany.mockResolvedValue({ count: 1 });
+
+    const response = await POST(request("{}"));
+    expect(response.status).toBe(200);
+    expect(purchaseUpdateMany).toHaveBeenCalledWith({
+      where: { stripePaymentIntentId: "pi_test_123", refundedAt: null },
+      data: { refundedAt: expect.any(Date) }
+    });
+  });
+
+  it("does not touch any Purchase on charge.refunded when the charge has no payment_intent", async () => {
+    constructEvent.mockReturnValue({
+      type: "charge.refunded",
+      data: { object: { payment_intent: null } }
+    });
+
+    const response = await POST(request("{}"));
+    expect(response.status).toBe(200);
+    expect(purchaseUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("marks the matching Purchase as disputed on charge.dispute.created", async () => {
+    constructEvent.mockReturnValue({
+      type: "charge.dispute.created",
+      data: { object: { payment_intent: "pi_test_456" } }
+    });
+    purchaseUpdateMany.mockResolvedValue({ count: 1 });
+
+    const response = await POST(request("{}"));
+    expect(response.status).toBe(200);
+    expect(purchaseUpdateMany).toHaveBeenCalledWith({
+      where: { stripePaymentIntentId: "pi_test_456", disputedAt: null },
+      data: { disputedAt: expect.any(Date) }
+    });
+  });
+
+  it("clears the dispute flag and restores access when charge.dispute.closed resolves as won", async () => {
+    constructEvent.mockReturnValue({
+      type: "charge.dispute.closed",
+      data: { object: { payment_intent: "pi_test_456", status: "won" } }
+    });
+    purchaseUpdateMany.mockResolvedValue({ count: 1 });
+
+    const response = await POST(request("{}"));
+    expect(response.status).toBe(200);
+    expect(purchaseUpdateMany).toHaveBeenCalledWith({
+      where: { stripePaymentIntentId: "pi_test_456" },
+      data: { disputedAt: null }
+    });
+  });
+
+  it("treats a lost dispute as a refund (funds are actually taken back)", async () => {
+    constructEvent.mockReturnValue({
+      type: "charge.dispute.closed",
+      data: { object: { payment_intent: "pi_test_456", status: "lost" } }
+    });
+    purchaseUpdateMany.mockResolvedValue({ count: 1 });
+
+    const response = await POST(request("{}"));
+    expect(response.status).toBe(200);
+    expect(purchaseUpdateMany).toHaveBeenCalledWith({
+      where: { stripePaymentIntentId: "pi_test_456", refundedAt: null },
+      data: { refundedAt: expect.any(Date) }
+    });
   });
 
   it("acknowledges unrelated event types with 200 without side effects", async () => {

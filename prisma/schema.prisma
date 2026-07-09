@@ -73,32 +73,42 @@ model Video {
 }
 
 model Purchase {
-  id                      String   @id @default(cuid())
+  id                      String    @id @default(cuid())
   userId                  String
   videoId                 String
   amount                  Int
   commissionBpsAtPurchase Int?
   commissionAmount        Int?
   coachNetAmount          Int?
-  createdAt               DateTime @default(now())
-  user                    User     @relation(fields: [userId], references: [id])
-  video                   Video    @relation(fields: [videoId], references: [id])
+  stripePaymentIntentId   String?   @unique
+  refundedAt              DateTime?
+  disputedAt              DateTime?
+  createdAt               DateTime  @default(now())
+  user                    User      @relation(fields: [userId], references: [id])
+  video                   Video     @relation(fields: [videoId], references: [id])
 
   @@unique([userId, videoId])
 }
 
+model RateLimitBucket {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+
+  @@index([resetAt])
+}
+
 model CoachRequest {
-  id               String    @id @default(cuid())
-  userId           String
-  status           String    @default("PENDING")
-  fullName         String
-  address          String
-  phone            String
-  ibanOrStripeInfo String
-  message          String?
-  createdAt        DateTime  @default(now())
-  reviewedAt       DateTime?
-  user             User      @relation(fields: [userId], references: [id])
+  id         String    @id @default(cuid())
+  userId     String
+  status     String    @default("PENDING")
+  fullName   String
+  address    String
+  phone      String
+  message    String?
+  createdAt  DateTime  @default(now())
+  reviewedAt DateTime?
+  user       User      @relation(fields: [userId], references: [id])
 }
 
 model Review {

@@ -34,7 +34,7 @@ export async function GET(_: Request, context: RouteContext) {
       deletedAt: true,
       videoUrl: true,
       purchases: {
-        where: { userId: session.user.id },
+        where: { userId: session.user.id, refundedAt: null, disputedAt: null },
         select: { id: true }
       }
     }

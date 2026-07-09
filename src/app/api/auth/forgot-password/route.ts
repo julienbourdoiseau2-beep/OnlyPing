@@ -14,7 +14,7 @@ function getBaseUrl() {
 }
 
 export async function POST(request: Request) {
-  const rateLimit = checkRateLimit(request, "auth-forgot-password", { windowMs: 15 * 60 * 1000, max: 8 });
+  const rateLimit = await checkRateLimit(request, "auth-forgot-password", { windowMs: 15 * 60 * 1000, max: 8 });
   if (!rateLimit.ok) {
     return NextResponse.json({ error: "Trop de tentatives. Reessaie plus tard." }, { status: 429 });
   }
