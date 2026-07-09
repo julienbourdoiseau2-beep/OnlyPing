@@ -40,14 +40,14 @@ export function SiteHeader() {
               Profil
             </Link>
           ) : null}
-          <Link href="/dashboard" className="hover:text-white">
-            Espace coach
-          </Link>
-          {session?.user ? (
-            <Link href="/devenir-coach" className="hover:text-white">
-              Devenir coach
+          {session?.user?.role === "COACH" || session?.user?.role === "ADMIN" ? (
+            <Link href="/dashboard" className="hover:text-white">
+              Espace coach
             </Link>
           ) : null}
+          <Link href="/devenir-coach" className="hover:text-white">
+            Devenir coach
+          </Link>
           {session?.user?.role === "ADMIN" ? (
             <>
               <Link href="/admin/achats" className="hover:text-white">
@@ -100,14 +100,14 @@ export function SiteHeader() {
                 Profil
               </Link>
             ) : null}
-            <Link href="/dashboard" className="rounded px-2 py-2 hover:bg-white/10" onClick={closeMobileMenu}>
-              Espace coach
-            </Link>
-            {session?.user ? (
-              <Link href="/devenir-coach" className="rounded px-2 py-2 hover:bg-white/10" onClick={closeMobileMenu}>
-                Devenir coach
+            {session?.user?.role === "COACH" || session?.user?.role === "ADMIN" ? (
+              <Link href="/dashboard" className="rounded px-2 py-2 hover:bg-white/10" onClick={closeMobileMenu}>
+                Espace coach
               </Link>
             ) : null}
+            <Link href="/devenir-coach" className="rounded px-2 py-2 hover:bg-white/10" onClick={closeMobileMenu}>
+              Devenir coach
+            </Link>
 
             {session?.user?.role === "ADMIN" ? (
               <>

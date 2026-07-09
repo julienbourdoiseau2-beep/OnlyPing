@@ -38,7 +38,6 @@ export default async function CoachRequestDetailPage({ params }: AdminCoachReque
         <p className="text-sm text-[#b8c1cd]">Rôle actuel : {request.user.role}</p>
         <p className="mt-4 text-sm text-[#b8c1cd]">Adresse : {request.address}</p>
         <p className="text-sm text-[#b8c1cd]">Téléphone : {request.phone}</p>
-        <p className="text-sm text-[#b8c1cd]">IBAN / Stripe : {request.ibanOrStripeInfo}</p>
         {request.message ? <p className="mt-4 text-sm text-[#d7dde5]">{request.message}</p> : null}
       </div>
 

@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { computeCommissionAmounts, getEffectiveCommissionBps } from "@/lib/commission";
 import { prisma } from "@/lib/prisma";
@@ -14,21 +15,11 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    return (
-      <section className="mx-auto max-w-4xl px-3 sm:px-4 py-12">
-        <h1 className="text-3xl font-bold">Connexion requise</h1>
-        <p className="mt-2 text-[#b8c1cd]">Connecte-toi pour acceder a l&apos;espace coach.</p>
-      </section>
-    );
+    redirect("/login");
   }
 
   if (session.user.role !== "COACH" && session.user.role !== "ADMIN") {
-    return (
-      <section className="mx-auto max-w-4xl px-3 sm:px-4 py-12">
-        <h1 className="text-3xl font-bold">Acces restreint</h1>
-        <p className="mt-2 text-[#b8c1cd]">Cette zone est reservee aux entraineurs et administrateurs.</p>
-      </section>
-    );
+    redirect("/");
   }
 
   const [videos, coach, coachStripeAccount, purchases] = await Promise.all([
@@ -48,7 +39,9 @@ export default async function DashboardPage() {
       where: {
         video: {
           coachId: session.user.id
-        }
+        },
+        refundedAt: null,
+        disputedAt: null
       },
       select: {
         amount: true,

@@ -28,7 +28,14 @@ describe("middleware: unauthenticated access", () => {
     expect(response.status).toBe(200);
   });
 
-  it.each(["/dashboard", "/dashboard/settings", "/mes-achats", "/profil", "/devenir-coach", "/admin", "/admin/achats"])(
+  it("lets an anonymous visitor browse the coach recruitment landing page", async () => {
+    getToken.mockResolvedValue(null);
+    const response = await middleware(makeRequest("/devenir-coach"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it.each(["/dashboard", "/dashboard/settings", "/mes-achats", "/profil", "/admin", "/admin/achats"])(
     "redirects an anonymous visitor away from the protected page %s",
     async (path) => {
       getToken.mockResolvedValue(null);

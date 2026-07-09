@@ -36,7 +36,6 @@ export default async function CoachRequestsAdminPage() {
                 <p className="text-sm text-[#b8c1cd]">{request.user.name} — {request.user.email}</p>
                 <p className="mt-2 text-sm text-[#b8c1cd]">Téléphone : {request.phone}</p>
                 <p className="text-sm text-[#b8c1cd]">Adresse : {request.address}</p>
-                <p className="text-sm text-[#b8c1cd]">IBAN/Stripe : {request.ibanOrStripeInfo}</p>
                 {request.message ? <p className="mt-2 text-sm text-[#d7dde5]">{request.message}</p> : null}
               </div>
               <div className="flex flex-wrap gap-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -29,6 +30,9 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialAvatarUr
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   async function uploadAvatarFile(file: File) {
     setProfileError("");
@@ -112,6 +116,23 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialAvatarUr
     setCurrentPassword("");
     setNewPassword("");
     setPasswordSuccess("Mot de passe mis a jour.");
+  }
+
+  async function deleteAccount() {
+    setDeleteError("");
+    setIsDeleting(true);
+
+    const response = await fetch("/api/profile", { method: "DELETE" });
+
+    setIsDeleting(false);
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => ({}))) as { error?: string };
+      setDeleteError(payload.error ?? "Suppression impossible");
+      return;
+    }
+
+    await signOut({ callbackUrl: "/" });
   }
 
   return (
@@ -232,6 +253,35 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialAvatarUr
           {isSavingPassword ? "Mise a jour..." : "Changer le mot de passe"}
         </button>
       </form>
+
+      <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-6 lg:col-span-2">
+        <h2 className="text-2xl font-semibold text-rose-300">Supprimer mon compte</h2>
+        <p className="mt-1 text-sm text-[#b8c1cd]">
+          Conformement au RGPD, tu peux demander la suppression de ton compte a tout moment. Tes informations
+          personnelles (nom, email, mot de passe, photo) seront anonymisees immediatement et de maniere irreversible.
+          Ton historique d&apos;achats est conserve de maniere anonyme pour repondre a nos obligations comptables.
+        </p>
+        <label className="mt-4 block text-sm text-[#b8c1cd]">
+          Tape SUPPRIMER pour confirmer
+          <input
+            type="text"
+            value={deleteConfirmation}
+            onChange={(event) => setDeleteConfirmation(event.target.value)}
+            className="mt-1 w-full max-w-xs rounded-lg border border-rose-500/30 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-rose-400/60"
+          />
+        </label>
+
+        {deleteError ? <p className="mt-3 text-sm text-[#ff6b6b]">{deleteError}</p> : null}
+
+        <button
+          type="button"
+          onClick={deleteAccount}
+          disabled={isDeleting || deleteConfirmation !== "SUPPRIMER"}
+          className="mt-4 rounded-full border border-rose-500/40 bg-rose-500/10 px-5 py-2 font-semibold text-rose-300 hover:bg-rose-500/20 disabled:opacity-50"
+        >
+          {isDeleting ? "Suppression..." : "Supprimer definitivement mon compte"}
+        </button>
+      </div>
     </div>
   );
 }

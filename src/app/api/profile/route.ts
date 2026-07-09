@@ -1,5 +1,7 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -78,4 +80,59 @@ export async function PATCH(request: Request) {
   });
 
   return NextResponse.json(updated);
+}
+
+export async function DELETE() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
+  }
+
+  const stripeAccount = await prisma.coachStripeAccount.findUnique({
+    where: { userId: session.user.id },
+    select: { stripeConnectId: true }
+  });
+
+  if (stripeAccount?.stripeConnectId) {
+    return NextResponse.json(
+      {
+        error:
+          "Ce compte est relie a un compte de paiement Stripe actif. Contacte le support pour finaliser la suppression de ton compte coach."
+      },
+      { status: 409 }
+    );
+  }
+
+  // RGPD : on anonymise plutot que de supprimer la ligne, car l'historique d'achats
+  // (Purchase) doit etre conserve pour les obligations comptables (facturation 10 ans).
+  const anonymizedEmail = `deleted-${session.user.id}-${randomUUID()}@deleted.onlyping.local`;
+  const invalidatedPasswordHash = await bcrypt.hash(randomUUID(), 10);
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        name: "Utilisateur supprime",
+        email: anonymizedEmail,
+        avatarUrl: null,
+        passwordHash: invalidatedPasswordHash,
+        emailVerified: false,
+        resetToken: null,
+        resetTokenExpiry: null,
+        verificationCode: null,
+        verificationCodeExpiry: null
+      }
+    }),
+    prisma.coachRequest.updateMany({
+      where: { userId: session.user.id },
+      data: {
+        fullName: "Utilisateur supprime",
+        address: "Supprime",
+        phone: "Supprime",
+        message: null
+      }
+    })
+  ]);
+
+  return NextResponse.json({ ok: true });
 }

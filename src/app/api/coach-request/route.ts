@@ -9,7 +9,6 @@ const bodySchema = z.object({
   fullName: z.string().min(2).max(120),
   address: z.string().min(2).max(240),
   phone: z.string().min(4).max(40),
-  ibanOrStripeInfo: z.string().min(3).max(240),
   message: z.string().max(1000).optional().or(z.literal(""))
 });
 
@@ -30,7 +29,6 @@ export async function POST(request: Request) {
       fullName: parsed.data.fullName.trim(),
       address: parsed.data.address.trim(),
       phone: parsed.data.phone.trim(),
-      ibanOrStripeInfo: parsed.data.ibanOrStripeInfo.trim(),
       message: parsed.data.message?.trim() || null
     },
     include: {
