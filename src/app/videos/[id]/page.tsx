@@ -157,7 +157,11 @@ export default async function VideoDetailsPage({ params }: Params) {
 
         {canWatch ? (
           <div className="mt-6 rounded-[10px] border border-[#30363d] bg-[#21262d] p-3 md:col-span-2">
-            <video controls className="w-full rounded-lg" src={`/api/videos/${video.id}/stream`} />
+            <video
+              controls
+              className="aspect-video max-h-[70vh] w-full rounded-lg bg-black"
+              src={`/api/videos/${video.id}/stream`}
+            />
           </div>
         ) : session?.user ? (
           <div className="md:col-span-2">
