@@ -51,6 +51,8 @@ export default async function DashboardPage() {
         createdAt: true,
         video: {
           select: {
+            id: true,
+            title: true,
             commissionBpsOverride: true,
             coach: {
               select: {
@@ -69,6 +71,7 @@ export default async function DashboardPage() {
   let commissionCents = 0;
   let netCents = 0;
   const monthlyTotals = new Map<string, { sales: number; gross: number; commission: number; net: number }>();
+  const videoTotals = new Map<string, { title: string; sales: number; gross: number; commission: number; net: number }>();
 
   for (const purchase of purchases) {
     const bps =
@@ -84,17 +87,34 @@ export default async function DashboardPage() {
     netCents += amounts.coachNetAmount;
 
     const monthKey = new Date(purchase.createdAt).toISOString().slice(0, 7);
-    const existing = monthlyTotals.get(monthKey) ?? { sales: 0, gross: 0, commission: 0, net: 0 };
-    existing.sales += 1;
-    existing.gross += purchase.amount;
-    existing.commission += amounts.commissionAmount;
-    existing.net += amounts.coachNetAmount;
-    monthlyTotals.set(monthKey, existing);
+    const existingMonth = monthlyTotals.get(monthKey) ?? { sales: 0, gross: 0, commission: 0, net: 0 };
+    existingMonth.sales += 1;
+    existingMonth.gross += purchase.amount;
+    existingMonth.commission += amounts.commissionAmount;
+    existingMonth.net += amounts.coachNetAmount;
+    monthlyTotals.set(monthKey, existingMonth);
+
+    const existingVideo = videoTotals.get(purchase.video.id) ?? {
+      title: purchase.video.title,
+      sales: 0,
+      gross: 0,
+      commission: 0,
+      net: 0
+    };
+    existingVideo.sales += 1;
+    existingVideo.gross += purchase.amount;
+    existingVideo.commission += amounts.commissionAmount;
+    existingVideo.net += amounts.coachNetAmount;
+    videoTotals.set(purchase.video.id, existingVideo);
   }
 
   const monthlyRows = Array.from(monthlyTotals.entries())
     .map(([month, values]) => ({ month, ...values }))
     .sort((a, b) => (a.month < b.month ? 1 : -1));
+
+  const videoSalesRows = Array.from(videoTotals.entries())
+    .map(([videoId, values]) => ({ videoId, ...values }))
+    .sort((a, b) => b.gross - a.gross);
 
   return (
     <section className="mx-auto max-w-6xl px-3 sm:px-4 py-12">
@@ -158,6 +178,38 @@ export default async function DashboardPage() {
               monthlyRows.map((row) => (
                 <tr key={row.month} className="border-t border-white/10">
                   <td className="px-4 py-3">{row.month}</td>
+                  <td className="px-4 py-3">{row.sales}</td>
+                  <td className="px-4 py-3">{(row.gross / 100).toFixed(2)} EUR</td>
+                  <td className="px-4 py-3">{(row.commission / 100).toFixed(2)} EUR</td>
+                  <td className="px-4 py-3">{(row.net / 100).toFixed(2)} EUR</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mt-10 text-2xl font-semibold">Ventes par video</h2>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-white/5 text-[#cbd3dd]">
+            <tr>
+              <th className="px-4 py-3">Video</th>
+              <th className="px-4 py-3">Ventes</th>
+              <th className="px-4 py-3">CA brut</th>
+              <th className="px-4 py-3">Commission</th>
+              <th className="px-4 py-3">Gain reel</th>
+            </tr>
+          </thead>
+          <tbody>
+            {videoSalesRows.length === 0 ? (
+              <tr>
+                <td className="px-4 py-3 text-[#94a3b8]" colSpan={5}>Aucune vente pour le moment.</td>
+              </tr>
+            ) : (
+              videoSalesRows.map((row) => (
+                <tr key={row.videoId} className="border-t border-white/10">
+                  <td className="px-4 py-3">{row.title}</td>
                   <td className="px-4 py-3">{row.sales}</td>
                   <td className="px-4 py-3">{(row.gross / 100).toFixed(2)} EUR</td>
                   <td className="px-4 py-3">{(row.commission / 100).toFixed(2)} EUR</td>
