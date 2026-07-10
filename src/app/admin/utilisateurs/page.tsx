@@ -40,7 +40,9 @@ export default async function AdminUsersPage() {
       name: true,
       email: true,
       role: true,
-      createdAt: true
+      createdAt: true,
+      emailVerified: true,
+      _count: { select: { purchases: true } }
     },
     orderBy: [{ role: "desc" }, { createdAt: "asc" }]
   });
@@ -57,10 +59,22 @@ export default async function AdminUsersPage() {
         name: user.name,
         email: user.email,
         role,
-        createdAt: user.createdAt.toISOString()
+        createdAt: user.createdAt.toISOString(),
+        emailVerified: user.emailVerified,
+        purchaseCount: user._count.purchases
       };
     })
-    .filter((user): user is { id: string; name: string; email: string; role: AppRole; createdAt: string } => user !== null);
+    .filter(
+      (user): user is {
+        id: string;
+        name: string;
+        email: string;
+        role: AppRole;
+        createdAt: string;
+        emailVerified: boolean;
+        purchaseCount: number;
+      } => user !== null
+    );
 
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-12">
