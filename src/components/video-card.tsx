@@ -42,7 +42,10 @@ export function VideoCard({ id, title, thumbnail, category, level, durationMin, 
   const showThumbnail = Boolean(thumbnail && thumbnail !== "/uploads/default-thumb.jpg");
 
   return (
-    <article className="group rounded-md border border-line bg-surface p-4 shadow-resting transition hover:-translate-y-0.5 hover:shadow-raised">
+    <Link
+      href={`/videos/${id}`}
+      className="group block rounded-md border border-line bg-surface p-4 shadow-resting transition hover:-translate-y-0.5 hover:shadow-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+    >
       {showThumbnail ? (
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm">
           <Image
@@ -84,13 +87,18 @@ export function VideoCard({ id, title, thumbnail, category, level, durationMin, 
 
       <div className="mt-5 flex items-center justify-between">
         <span className="text-xl font-bold text-accent">{euroPrice} EUR</span>
-        <Link
-          href={`/videos/${id}`}
-          className="rounded-sm bg-accent px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-deep"
-        >
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent transition-colors group-hover:text-accent-deep">
           Voir
-        </Link>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            fill="none"
+            className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+          >
+            <path d="M7 4l6 6-6 6" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
       </div>
-    </article>
+    </Link>
   );
 }

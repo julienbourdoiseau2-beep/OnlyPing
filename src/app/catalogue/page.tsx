@@ -61,32 +61,16 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
             name: true,
             avatarUrl: true
           }
+        },
+        reviews: {
+          select: {
+            rating: true
+          }
         }
       },
       orderBy: { createdAt: "desc" }
     })
   ]);
-
-  const videoIds = videos.map((video) => video.id);
-  const reviewStats =
-    videoIds.length > 0
-      ? await prisma.review.groupBy({
-          by: ["videoId"],
-          where: {
-            videoId: { in: videoIds }
-          },
-          _count: {
-            _all: true
-          },
-          _avg: {
-            rating: true
-          }
-        })
-      : [];
-
-  const reviewStatsByVideoId = new Map(
-    reviewStats.map((row) => [row.videoId, { averageRating: row._avg.rating, reviewCount: row._count._all }])
-  );
 
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-12">
@@ -171,9 +155,11 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((video) => {
-          const stats = reviewStatsByVideoId.get(video.id);
-          const averageRating = stats?.averageRating ?? null;
-          const reviewCount = stats?.reviewCount ?? 0;
+          const reviewCount = video.reviews.length;
+          const averageRating =
+            reviewCount > 0
+              ? video.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+              : null;
 
           return (
             <VideoCard
