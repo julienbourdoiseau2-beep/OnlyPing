@@ -47,8 +47,19 @@ export function AdminUserRoleManager({ users: initialUsers, currentAdminId }: Ad
   const [messageByUser, setMessageByUser] = useState<Record<string, string>>({});
   const [deletingByUser, setDeletingByUser] = useState<Record<string, boolean>>({});
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const selectedUser = users.find((user) => user.id === selectedUserId) ?? null;
+
+  const filteredUsers = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) {
+      return users;
+    }
+    return users.filter(
+      (user) => user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
+    );
+  }, [users, search]);
 
   async function saveRole(userId: string) {
     setLoadingByUser((prev) => ({ ...prev, [userId]: true }));
@@ -102,9 +113,22 @@ export function AdminUserRoleManager({ users: initialUsers, currentAdminId }: Ad
 
   return (
     <>
-      <section className="mt-6 overflow-hidden rounded-md border border-line bg-surface shadow-resting md:hidden">
+      <div className="mt-6">
+        <input
+          type="search"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Rechercher par nom ou email"
+          className="w-full max-w-sm rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent md:w-auto"
+        />
+        <span className="ml-3 text-xs text-ink-muted">
+          {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? "s" : ""}
+        </span>
+      </div>
+
+      <section className="mt-3 overflow-hidden rounded-md border border-line bg-surface shadow-resting md:hidden">
         <div className="divide-y divide-line">
-          {users.map((user) => {
+          {filteredUsers.map((user) => {
             const nextRole = roles[user.id] ?? user.role;
             const hasChanged = nextRole !== user.role;
             const isLoading = loadingByUser[user.id] === true;
@@ -139,7 +163,7 @@ export function AdminUserRoleManager({ users: initialUsers, currentAdminId }: Ad
         </div>
       </section>
 
-      <section className="mt-6 hidden overflow-hidden rounded-md border border-line bg-surface shadow-resting md:block">
+      <section className="mt-3 hidden overflow-hidden rounded-md border border-line bg-surface shadow-resting md:block">
         <div className="overflow-x-auto">
           <table className="min-w-[1080px] text-left text-sm">
             <thead className="bg-surface-alt text-ink-muted">
@@ -155,7 +179,7 @@ export function AdminUserRoleManager({ users: initialUsers, currentAdminId }: Ad
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => {
+              {filteredUsers.map((user) => {
                 const nextRole = roles[user.id] ?? user.role;
                 const hasChanged = nextRole !== user.role;
                 const isLoading = loadingByUser[user.id] === true;

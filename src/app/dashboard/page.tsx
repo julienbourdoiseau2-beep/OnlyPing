@@ -8,6 +8,7 @@ import { CoachUploadForm } from "@/components/coach-upload-form";
 import { CoachVideoSettingsForm } from "@/components/coach-video-settings-form";
 import { CoachVideosMobileManager } from "@/components/coach-videos-mobile-manager";
 import { DeleteVideoButton } from "@/components/delete-video-button";
+import { MonthlyRevenueChart } from "@/components/monthly-revenue-chart";
 import { PublishToggleButton } from "@/components/publish-toggle-button";
 import { RestartOnboardingButton } from "@/components/restart-onboarding-button";
 
@@ -157,6 +158,17 @@ export default async function DashboardPage() {
         Ta part est versee automatiquement sur ton compte Stripe a chaque vente, au taux de commission indique pour
         chaque video ci-dessous.
       </p>
+
+      {monthlyRows.length > 1 ? (
+        <div className="mt-6">
+          <MonthlyRevenueChart
+            title="Tendance des ventes"
+            data={[...monthlyRows]
+              .sort((a, b) => (a.month < b.month ? -1 : 1))
+              .map((row) => ({ label: row.month, grossCents: row.gross, sales: row.sales }))}
+          />
+        </div>
+      ) : null}
 
       <div className="mt-6 overflow-hidden rounded-md border border-line bg-surface shadow-resting">
         <table className="min-w-full text-left text-sm">

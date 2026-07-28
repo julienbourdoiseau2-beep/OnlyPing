@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { computeCommissionAmounts, getEffectiveCommissionBps } from "@/lib/commission";
 import { getStripeServerClient } from "@/lib/stripe";
+import { sendEmail } from "@/lib/email";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import Stripe from "stripe";
@@ -106,6 +107,34 @@ export async function POST(request: Request) {
       await prisma.purchase.updateMany({
         where: { stripePaymentIntentId: paymentIntentId, disputedAt: null },
         data: { disputedAt: new Date() }
+      });
+
+      const purchase = await prisma.purchase.findFirst({
+        where: { stripePaymentIntentId: paymentIntentId },
+        select: {
+          amount: true,
+          user: { select: { name: true, email: true } },
+          video: { select: { title: true } }
+        }
+      });
+
+      const adminEmail = process.env.ADMIN_EMAIL || "admin@onlyping.fr";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+      const dueBy = dispute.evidence_details?.due_by
+        ? new Date(dispute.evidence_details.due_by * 1000).toLocaleString("fr-FR")
+        : "non communique par Stripe";
+
+      await sendEmail({
+        to: adminEmail,
+        subject: `Litige Stripe ouvert${purchase ? ` - ${purchase.video.title}` : ""}`,
+        html: `<p>Un litige (chargeback) vient d'etre ouvert sur un paiement.</p>` +
+          (purchase
+            ? `<p>Video : ${purchase.video.title}<br/>Client : ${purchase.user.name} (${purchase.user.email})<br/>Montant : ${(purchase.amount / 100).toFixed(2)} EUR</p>`
+            : "") +
+          `<p><strong>Date limite pour repondre au litige : ${dueBy}.</strong></p>` +
+          `<p>Voir le detail dans le <a href="https://dashboard.stripe.com/disputes">dashboard Stripe</a> et le suivi des achats : <a href="${appUrl}/admin/achats">${appUrl}/admin/achats</a></p>`
+      }).catch((error) => {
+        console.error("Envoi email alerte litige Stripe echoue", error);
       });
     }
   }

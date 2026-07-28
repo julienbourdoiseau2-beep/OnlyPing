@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { computeCommissionAmounts, getEffectiveCommissionBps } from "@/lib/commission";
 import { prisma } from "@/lib/prisma";
 import { AdminCommissionManager } from "@/components/admin-commission-manager";
+import { MonthlyRevenueChart } from "@/components/monthly-revenue-chart";
 
 type SearchParams = {
   sort?: string;
@@ -185,6 +186,7 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
       commissionAmount: true,
       coachNetAmount: true,
       commissionBpsAtPurchase: true,
+      createdAt: true,
       video: {
         select: {
           commissionBpsOverride: true,
@@ -201,6 +203,7 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
   });
 
   const coachTotalsMap = new Map<string, { coachName: string; gross: number; commission: number; net: number; sales: number }>();
+  const monthlyTotalsMap = new Map<string, { gross: number; sales: number }>();
   let totalCommissionCents = 0;
   let totalCoachNetCents = 0;
 
@@ -230,9 +233,18 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
     existing.net += amounts.coachNetAmount;
     existing.sales += 1;
     coachTotalsMap.set(purchase.video.coach.id, existing);
+
+    const monthKey = purchase.createdAt.toISOString().slice(0, 7);
+    const existingMonth = monthlyTotalsMap.get(monthKey) ?? { gross: 0, sales: 0 };
+    existingMonth.gross += purchase.amount;
+    existingMonth.sales += 1;
+    monthlyTotalsMap.set(monthKey, existingMonth);
   }
 
   const coachTotals = Array.from(coachTotalsMap.values()).sort((a, b) => b.gross - a.gross);
+  const monthlyChartData = Array.from(monthlyTotalsMap.entries())
+    .map(([month, values]) => ({ label: month, grossCents: values.gross, sales: values.sales }))
+    .sort((a, b) => (a.label < b.label ? -1 : 1));
 
   const totalRevenueCents = revenueAggregateClean._sum.amount ?? 0;
   const totalRevenueEur = (totalRevenueCents / 100).toFixed(2);
@@ -323,6 +335,24 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
           Reinitialiser
         </Link>
       </form>
+
+      <div className="mt-3 flex justify-end">
+        <a
+          href={`/api/admin/achats/export?${new URLSearchParams({
+            ...(coachId ? { coachId } : {}),
+            ...(month ? { month } : {})
+          }).toString()}`}
+          className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-alt px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-line"
+        >
+          Exporter en CSV
+        </a>
+      </div>
+
+      {monthlyChartData.length > 1 ? (
+        <div className="mt-6">
+          <MonthlyRevenueChart title="Tendance des ventes (plateforme)" data={monthlyChartData} />
+        </div>
+      ) : null}
 
       <div className="mt-6 overflow-hidden rounded-md border border-line bg-surface shadow-resting">
         <table className="min-w-full text-left text-sm">

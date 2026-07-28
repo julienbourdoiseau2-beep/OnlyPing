@@ -57,6 +57,9 @@ export function SiteHeader() {
           ) : null}
           {session?.user?.role === "ADMIN" ? (
             <>
+              <Link href="/admin" className="transition-colors hover:text-ink">
+                Administration
+              </Link>
               <Link href="/admin/achats" className="transition-colors hover:text-ink">
                 Admin achats
               </Link>
@@ -124,6 +127,9 @@ export function SiteHeader() {
 
             {session?.user?.role === "ADMIN" ? (
               <>
+                <Link href="/admin" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
+                  Administration
+                </Link>
                 <Link href="/admin/achats" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
                   Admin achats
                 </Link>
