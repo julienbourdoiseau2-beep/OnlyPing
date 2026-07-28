@@ -19,7 +19,6 @@ const bodyFont = Inter({
 export const metadata: Metadata = {
   title: "OnlyPing - Videos techniques de ping-pong",
   description: "Plateforme de videos techniques de ping-pong alimentee par des entraineurs.",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -44,7 +43,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f7fb" },
+    { media: "(prefers-color-scheme: light)", color: "#eef0f5" },
     { media: "(prefers-color-scheme: dark)", color: "#0a0f1c" }
   ]
 };
@@ -68,6 +67,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${displayFont.variable} ${bodyFont.variable}`}>
+      {/* Rendered manually (not via metadata.manifest) so Next doesn't force
+          crossOrigin="use-credentials" on the tag, which can block PWA
+          installability: https://github.com/vercel/next.js/issues/26881 */}
+      <link rel="manifest" href="/manifest.json" />
       <body className="bg-bg text-ink">
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
