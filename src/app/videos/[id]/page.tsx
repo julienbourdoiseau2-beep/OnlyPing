@@ -5,19 +5,24 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { toLevelLabel } from "@/lib/video-taxonomy";
+import { PaymentStatusBanner } from "@/components/payment-status-banner";
 import { PurchaseButton } from "@/components/purchase-button";
 import { VideoReviewForm } from "@/components/video-review-form";
 
 type Params = {
   params: { id: string };
+  searchParams?: { payment?: string };
 };
 
 function shouldUseUnoptimizedImage(src: string) {
   return !src.startsWith("/");
 }
 
-export default async function VideoDetailsPage({ params }: Params) {
+export default async function VideoDetailsPage({ params, searchParams }: Params) {
   const session = await getServerSession(authOptions);
+  const paymentStatus = searchParams?.payment === "success" || searchParams?.payment === "cancel"
+    ? searchParams.payment
+    : null;
 
   const video = await prisma.video.findUnique({
     where: { id: params.id },
@@ -84,6 +89,8 @@ export default async function VideoDetailsPage({ params }: Params) {
 
   return (
     <section className="mx-auto max-w-5xl px-3 sm:px-4 py-12">
+      <PaymentStatusBanner status={paymentStatus} canWatch={canWatch} />
+
       {showThumbnail ? (
         <Image
           unoptimized={shouldUseUnoptimizedImage(video.thumbnail)}

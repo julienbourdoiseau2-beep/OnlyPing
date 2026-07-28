@@ -4,6 +4,7 @@ import { VIDEO_LEVEL_LABELS, VIDEO_LEVEL_VALUES } from "@/lib/video-taxonomy";
 
 type CataloguePageProps = {
   searchParams?: {
+    q?: string;
     coachId?: string;
     category?: string;
     level?: string;
@@ -18,6 +19,7 @@ const categories = [
 ];
 
 export default async function CataloguePage({ searchParams }: CataloguePageProps) {
+  const query = (searchParams?.q ?? "").trim();
   const coachId = searchParams?.coachId ?? "";
   const category = searchParams?.category ?? "";
   const rawLevel = (searchParams?.level ?? "").toUpperCase();
@@ -26,6 +28,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
   const videoWhere = {
     isPublished: true,
     deletedAt: null,
+    ...(query ? { title: { contains: query, mode: "insensitive" as const } } : {}),
     ...(coachId ? { coachId } : {}),
     ...(category ? { category } : {}),
     ...(level ? { level } : {})
@@ -92,7 +95,18 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
         Choisis ta prochaine seance selon ton niveau et travaille avec les methodes des entraineurs.
       </p>
 
-      <form className="mt-6 grid gap-3 rounded-md border border-line bg-surface p-4 shadow-resting md:grid-cols-5 md:items-end">
+      <form className="mt-6 grid gap-3 rounded-md border border-line bg-surface p-4 shadow-resting md:grid-cols-6 md:items-end">
+        <label className="text-sm text-ink-muted md:col-span-2">
+          Rechercher
+          <input
+            type="search"
+            name="q"
+            defaultValue={query}
+            placeholder="Titre de la video..."
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
+          />
+        </label>
+
         <label className="text-sm text-ink-muted">
           Entraineur
           <select

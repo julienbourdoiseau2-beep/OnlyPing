@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/email";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -23,7 +24,12 @@ export async function POST(request: Request, context: RouteContext) {
 
   const video = await prisma.video.findUnique({
     where: { id: context.params.id },
-    select: { id: true, isPublished: true }
+    select: {
+      id: true,
+      title: true,
+      isPublished: true,
+      coach: { select: { name: true, email: true } }
+    }
   });
 
   if (!video || !video.isPublished) {
@@ -49,6 +55,16 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Avis invalide" }, { status: 400 });
   }
 
+  const existingReview = await prisma.review.findUnique({
+    where: {
+      userId_videoId: {
+        userId: session.user.id,
+        videoId: video.id
+      }
+    },
+    select: { id: true }
+  });
+
   const review = await prisma.review.upsert({
     where: {
       userId_videoId: {
@@ -73,6 +89,17 @@ export async function POST(request: Request, context: RouteContext) {
       updatedAt: true
     }
   });
+
+  if (!existingReview) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+    await sendEmail({
+      to: video.coach.email,
+      subject: `Nouvel avis sur "${video.title}"`,
+      html: `<p>Bonjour ${video.coach.name},</p><p>${session.user.name} a laisse un avis (${parsed.data.rating} / 5) sur ta video <strong>${video.title}</strong> :</p><p>&laquo;&nbsp;${parsed.data.comment}&nbsp;&raquo;</p><p>Voir la vidéo : <a href="${appUrl}/videos/${video.id}">${appUrl}/videos/${video.id}</a></p>`
+    }).catch((error) => {
+      console.error("Envoi email nouvel avis au coach echoue", error);
+    });
+  }
 
   return NextResponse.json(review);
 }

@@ -5,14 +5,32 @@ import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+function MenuIcon({ open }: { open: boolean }) {
+  if (open) {
+    return (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function SiteHeader() {
   const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  const mobileLinkClass =
+    "flex items-center rounded-sm px-3 py-3 text-base text-ink transition-colors hover:bg-surface-alt active:bg-surface-alt";
+
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-surface/90 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-display font-semibold tracking-tight text-ink">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
@@ -21,17 +39,17 @@ export function SiteHeader() {
           OnlyPing
         </Link>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1 md:hidden">
           <ThemeToggle />
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            className="rounded-full border border-line px-3 py-2 text-sm text-ink hover:bg-surface-alt"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink hover:bg-surface-alt"
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-nav"
-            aria-label="Ouvrir le menu"
+            aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
-            Menu
+            <MenuIcon open={isMobileMenuOpen} />
           </button>
         </div>
 
@@ -56,20 +74,9 @@ export function SiteHeader() {
             </Link>
           ) : null}
           {session?.user?.role === "ADMIN" ? (
-            <>
-              <Link href="/admin" className="transition-colors hover:text-ink">
-                Administration
-              </Link>
-              <Link href="/admin/achats" className="transition-colors hover:text-ink">
-                Admin achats
-              </Link>
-              <Link href="/admin/utilisateurs" className="transition-colors hover:text-ink">
-                Admin utilisateurs
-              </Link>
-              <Link href="/admin/coach-requests" className="transition-colors hover:text-ink">
-                Demandes coach
-              </Link>
-            </>
+            <Link href="/admin" className="transition-colors hover:text-ink">
+              Administration
+            </Link>
           ) : null}
 
           <span className="h-5 w-px bg-line" aria-hidden="true" />
@@ -100,83 +107,77 @@ export function SiteHeader() {
       </div>
 
       {isMobileMenuOpen ? (
-        <nav
-          id="mobile-nav"
-          className="border-t border-line bg-surface px-3 py-3 text-sm text-ink-muted md:hidden"
-        >
-          <div className="flex flex-col gap-1">
-            <Link href="/catalogue" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-              Catalogue
-            </Link>
-            <Link href="/mes-achats" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-              Mes achats
-            </Link>
-            {session?.user ? (
-              <Link href="/profil" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-                Profil
+        <>
+          <button
+            type="button"
+            aria-label="Fermer le menu"
+            onClick={closeMobileMenu}
+            className="fixed inset-0 top-16 z-20 bg-ink/30 md:hidden"
+          />
+          <nav
+            id="mobile-nav"
+            className="fixed inset-x-0 top-16 z-30 max-h-[calc(100vh-4rem)] overflow-y-auto border-t border-line bg-surface px-3 pb-6 pt-2 shadow-raised md:hidden"
+          >
+            <div className="flex flex-col">
+              <Link href="/catalogue" className={mobileLinkClass} onClick={closeMobileMenu}>
+                Catalogue
               </Link>
-            ) : null}
-            <Link href="/dashboard" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-              Espace coach
-            </Link>
-            {session?.user ? (
-              <Link href="/devenir-coach" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-                Devenir coach
+              <Link href="/mes-achats" className={mobileLinkClass} onClick={closeMobileMenu}>
+                Mes achats
               </Link>
-            ) : null}
+              {session?.user ? (
+                <Link href="/profil" className={mobileLinkClass} onClick={closeMobileMenu}>
+                  Profil
+                </Link>
+              ) : null}
+              <Link href="/dashboard" className={mobileLinkClass} onClick={closeMobileMenu}>
+                Espace coach
+              </Link>
+              {session?.user ? (
+                <Link href="/devenir-coach" className={mobileLinkClass} onClick={closeMobileMenu}>
+                  Devenir coach
+                </Link>
+              ) : null}
 
-            {session?.user?.role === "ADMIN" ? (
-              <>
-                <Link href="/admin" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-                  Administration
-                </Link>
-                <Link href="/admin/achats" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-                  Admin achats
-                </Link>
-                <Link
-                  href="/admin/utilisateurs"
-                  className="rounded-sm px-2 py-2 hover:bg-surface-alt"
-                  onClick={closeMobileMenu}
-                >
-                  Admin utilisateurs
-                </Link>
-                <Link
-                  href="/admin/coach-requests"
-                  className="rounded-sm px-2 py-2 hover:bg-surface-alt"
-                  onClick={closeMobileMenu}
-                >
-                  Demandes coach
-                </Link>
-              </>
-            ) : null}
+              {session?.user?.role === "ADMIN" ? (
+                <>
+                  <div className="my-2 border-t border-line" />
+                  <Link href="/admin" className={mobileLinkClass} onClick={closeMobileMenu}>
+                    Administration
+                  </Link>
+                </>
+              ) : null}
 
-            {session?.user ? (
-              <button
-                type="button"
-                onClick={() => {
-                  closeMobileMenu();
-                  signOut({ callbackUrl: "/" });
-                }}
-                className="mt-1 rounded-sm border border-line px-3 py-2 text-left hover:bg-surface-alt"
-              >
-                Deconnexion
-              </button>
-            ) : (
-              <>
-                <Link href="/register" className="rounded-sm px-2 py-2 hover:bg-surface-alt" onClick={closeMobileMenu}>
-                  Inscription
-                </Link>
-                <Link
-                  href="/login"
-                  className="mt-1 rounded-full bg-accent px-3 py-2 text-center font-semibold text-white hover:bg-accent-deep"
-                  onClick={closeMobileMenu}
+              <div className="my-2 border-t border-line" />
+
+              {session?.user ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobileMenu();
+                    signOut({ callbackUrl: "/" });
+                  }}
+                  className={`${mobileLinkClass} text-left`}
                 >
-                  Connexion
-                </Link>
-              </>
-            )}
-          </div>
-        </nav>
+                  Deconnexion
+                </button>
+              ) : (
+                <>
+                  <Link href="/register" className={mobileLinkClass} onClick={closeMobileMenu}>
+                    Inscription
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="mt-2 rounded-full bg-accent px-3 py-3 text-center text-base font-semibold text-white hover:bg-accent-deep"
+                    onClick={closeMobileMenu}
+                  >
+                    Connexion
+                  </Link>
+                </>
+              )}
+            </div>
+          </nav>
+        </>
       ) : null}
     </header>
   );
