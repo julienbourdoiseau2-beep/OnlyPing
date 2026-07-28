@@ -20,7 +20,7 @@ export default async function AdminUsersPage() {
     return (
       <section className="mx-auto max-w-6xl px-3 sm:px-4 py-12">
         <h1 className="text-4xl font-bold">Gestion des utilisateurs</h1>
-        <p className="mt-2 text-[#b8c1cd]">Connecte-toi pour acceder a cette page.</p>
+        <p className="mt-2 text-ink-muted">Connecte-toi pour acceder a cette page.</p>
       </section>
     );
   }
@@ -29,7 +29,7 @@ export default async function AdminUsersPage() {
     return (
       <section className="mx-auto max-w-6xl px-3 sm:px-4 py-12">
         <h1 className="text-4xl font-bold">Gestion des utilisateurs</h1>
-        <p className="mt-2 text-[#b8c1cd]">Acces reserve aux administrateurs.</p>
+        <p className="mt-2 text-ink-muted">Acces reserve aux administrateurs.</p>
       </section>
     );
   }
@@ -79,7 +79,7 @@ export default async function AdminUsersPage() {
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-12">
       <h1 className="text-4xl font-bold">Gestion des utilisateurs</h1>
-      <p className="mt-2 text-[#b8c1cd]">
+      <p className="mt-2 text-ink-muted">
         Choisis qui est utilisateur, coach ou administrateur.
       </p>
 

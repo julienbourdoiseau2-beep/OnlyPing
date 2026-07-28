@@ -44,19 +44,19 @@ export function PurchasesFilterList({ purchases }: PurchasesFilterListProps) {
 
   return (
     <div>
-      <div className="mt-6 grid gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 md:grid-cols-[1fr_auto]">
+      <div className="mt-6 grid gap-3 rounded-md border border-line bg-surface p-4 shadow-resting md:grid-cols-[1fr_auto]">
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Rechercher par titre ou coach"
-          className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#f8fafc] outline-none focus:border-[#48cae4]"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         />
 
         <select
           value={level}
           onChange={(event) => setLevel(event.target.value)}
-          className="rounded-lg border border-white/20 bg-[#0f1724] px-3 py-2 text-sm text-[#f8fafc] outline-none focus:border-[#48cae4]"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         >
           {levels.map((levelOption) => (
             <option key={levelOption} value={levelOption}>
@@ -66,27 +66,27 @@ export function PurchasesFilterList({ purchases }: PurchasesFilterListProps) {
         </select>
       </div>
 
-      <p className="mt-3 text-sm text-[#cbd5e1]">{filtered.length} video(s) trouvee(s)</p>
+      <p className="mt-3 text-sm text-ink-muted">{filtered.length} video(s) trouvee(s)</p>
 
       <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((purchase) => (
-          <article key={purchase.id} className="rounded-2xl border border-white/10 bg-black/30 p-5">
-            <p className="text-xs uppercase tracking-widest text-[#90e0ef]">{purchase.video.level}</p>
-            <h2 className="mt-2 text-lg font-semibold">{purchase.video.title}</h2>
-            <p className="mt-2 text-sm text-[#cbd5e1]">Coach: {purchase.video.coachName}</p>
-            <p className="text-sm text-[#cbd5e1]">Duree: {purchase.video.durationMin} min</p>
-            <p className="text-sm text-[#cbd5e1]">Achat: {new Date(purchase.createdAt).toLocaleDateString("fr-FR")}</p>
+          <article key={purchase.id} className="rounded-md border border-line bg-surface p-5 shadow-resting">
+            <p className="text-xs uppercase tracking-widest text-ink-muted">{purchase.video.level}</p>
+            <h2 className="mt-2 text-lg font-semibold text-ink">{purchase.video.title}</h2>
+            <p className="mt-2 text-sm text-ink-muted">Coach: {purchase.video.coachName}</p>
+            <p className="text-sm text-ink-muted">Duree: {purchase.video.durationMin} min</p>
+            <p className="text-sm text-ink-muted">Achat: {new Date(purchase.createdAt).toLocaleDateString("fr-FR")}</p>
 
             <div className="mt-4 flex gap-2">
               <Link
                 href={`/videos/${purchase.video.id}`}
-                className="rounded-full bg-[#00b4d8] px-3 py-1 text-sm font-medium text-[#04111d] hover:bg-[#48cae4]"
+                className="rounded-full bg-accent px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-accent-deep"
               >
                 Ouvrir
               </Link>
               <a
                 href={`/api/videos/${purchase.video.id}/stream`}
-                className="rounded-full border border-[#90e0ef]/40 px-3 py-1 text-sm text-[#90e0ef] hover:bg-[#90e0ef]/10"
+                className="rounded-full border border-line px-3 py-1 text-sm text-ink transition-colors hover:bg-surface-alt"
               >
                 Lecture directe
               </a>

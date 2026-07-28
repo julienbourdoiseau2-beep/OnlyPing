@@ -67,7 +67,7 @@ export default function CguPage() {
       <h2>8. Donnees personnelles et cookies</h2>
       <p>
         Le traitement des donnees personnelles est decrit dans la{" "}
-        <a href="/confidentialite" className="underline hover:text-white">
+        <a href="/confidentialite" className="underline hover:text-ink">
           politique de confidentialite
         </a>
         .

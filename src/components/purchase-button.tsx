@@ -45,7 +45,7 @@ export function PurchaseButton({ videoId }: PurchaseButtonProps) {
 
   return (
     <div>
-      <label className="mt-6 flex items-start gap-2 text-xs text-[#b8c1cd]">
+      <label className="mt-6 flex items-start gap-2 text-xs text-ink-muted">
         <input
           type="checkbox"
           checked={hasConsented}
@@ -63,11 +63,11 @@ export function PurchaseButton({ videoId }: PurchaseButtonProps) {
         type="button"
         onClick={handlePurchase}
         disabled={isLoading || !hasConsented}
-        className="mt-3 rounded-full border border-white/20 bg-[#2d3540] px-5 py-2 font-semibold text-[#f1f5f9] hover:bg-[#3a4452] disabled:opacity-60"
+        className="mt-3 rounded-full bg-accent px-5 py-2 font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60"
       >
         {isLoading ? "Redirection..." : "Payer avec Stripe"}
       </button>
-      {error ? <p className="mt-2 text-sm text-[#ff6b6b]">{error}</p> : null}
+      {error ? <p className="mt-2 text-sm text-danger">{error}</p> : null}
     </div>
   );
 }

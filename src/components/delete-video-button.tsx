@@ -43,11 +43,11 @@ export function DeleteVideoButton({ videoId, title }: DeleteVideoButtonProps) {
         type="button"
         onClick={handleDelete}
         disabled={isLoading}
-        className="rounded-full border border-[#7f1d1d] bg-[#991b1b] px-3 py-1 text-xs font-semibold text-white transition hover:bg-[#b91c1c] disabled:opacity-60"
+        className="rounded-full border border-danger bg-danger px-3 py-1 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
       >
         {isLoading ? "Suppression..." : "Supprimer"}
       </button>
-      {error ? <p className="mt-1 text-xs text-[#ff6b6b]">{error}</p> : null}
+      {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
     </div>
   );
 }

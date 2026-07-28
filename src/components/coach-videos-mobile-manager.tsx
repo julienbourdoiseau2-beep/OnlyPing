@@ -36,7 +36,7 @@ export function CoachVideosMobileManager({ videos, coachCommissionBps, canPublis
 
   if (videos.length === 0) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-4 text-sm text-[#94a3b8]">
+      <div className="rounded-md border border-line bg-surface shadow-resting p-4 text-sm text-ink-muted">
         Aucune video pour le moment.
       </div>
     );
@@ -53,27 +53,27 @@ export function CoachVideosMobileManager({ videos, coachCommissionBps, canPublis
               key={video.id}
               type="button"
               onClick={() => setSelectedVideoId(video.id)}
-              className="w-full rounded-2xl border border-white/10 bg-[#12161b]/80 p-4 text-left hover:bg-[#182033]"
+              className="w-full rounded-md border border-line bg-surface shadow-resting p-4 text-left hover:bg-surface-alt"
             >
-              <h3 className="text-base font-semibold text-[#e6edf3]">{video.title}</h3>
-              <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[#b8c1cd]">
+              <h3 className="text-base font-semibold text-ink">{video.title}</h3>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink-muted">
                 <p>
-                  <span className="text-[#8b949e]">Categorie:</span> {video.category}
+                  <span className="text-ink-muted">Categorie:</span> {video.category}
                 </p>
                 <p>
-                  <span className="text-[#8b949e]">Niveau:</span> {toLevelLabel(video.level)}
+                  <span className="text-ink-muted">Niveau:</span> {toLevelLabel(video.level)}
                 </p>
                 <p>
-                  <span className="text-[#8b949e]">Prix:</span> {(video.priceCents / 100).toFixed(2)} EUR
+                  <span className="text-ink-muted">Prix:</span> {(video.priceCents / 100).toFixed(2)} EUR
                 </p>
                 <p>
-                  <span className="text-[#8b949e]">Commission:</span> {(effectiveCommission / 100).toFixed(2)} %
+                  <span className="text-ink-muted">Commission:</span> {(effectiveCommission / 100).toFixed(2)} %
                 </p>
                 <p className="col-span-2">
-                  <span className="text-[#8b949e]">Publiee:</span> {video.isPublished ? "Oui" : "Non"}
+                  <span className="text-ink-muted">Publiee:</span> {video.isPublished ? "Oui" : "Non"}
                 </p>
               </div>
-              <p className="mt-3 text-xs text-[#8b949e]">Touchez pour modifier</p>
+              <p className="mt-3 text-xs text-ink-muted">Touchez pour modifier</p>
             </button>
           );
         })}
@@ -81,17 +81,17 @@ export function CoachVideosMobileManager({ videos, coachCommissionBps, canPublis
 
       {selectedVideo ? (
         <div className="fixed inset-0 z-40 flex items-end bg-black/50" role="dialog" aria-modal="true">
-          <div className="max-h-[88vh] w-full overflow-y-auto rounded-t-2xl border border-white/10 bg-[#12161b] p-4">
-            <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-white/20" />
+          <div className="max-h-[88vh] w-full overflow-y-auto rounded-t-md border border-line bg-surface p-4">
+            <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-line" />
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-base font-semibold text-[#e6edf3]">{selectedVideo.title}</p>
-                <p className="mt-1 text-xs text-[#8b949e]">{toLevelLabel(selectedVideo.level)} · {selectedVideo.durationMin} min</p>
+                <p className="text-base font-semibold text-ink">{selectedVideo.title}</p>
+                <p className="mt-1 text-xs text-ink-muted">{toLevelLabel(selectedVideo.level)} · {selectedVideo.durationMin} min</p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedVideoId(null)}
-                className="rounded border border-white/20 px-2 py-1 text-xs text-[#d7dde5]"
+                className="rounded border border-line px-2 py-1 text-xs text-ink-muted"
               >
                 Fermer
               </button>

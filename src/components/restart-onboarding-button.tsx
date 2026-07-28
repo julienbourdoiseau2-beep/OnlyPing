@@ -28,11 +28,11 @@ export function RestartOnboardingButton() {
         type="button"
         onClick={handleClick}
         disabled={isLoading}
-        className="w-full rounded-full border border-white/20 bg-[#2d3540] px-4 py-2 font-semibold text-[#edf1f6] hover:bg-[#3a4452] disabled:opacity-60"
+        className="w-full rounded-full bg-accent px-4 py-2 font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60"
       >
         {isLoading ? "Redirection..." : "Completer mon compte de paiement"}
       </button>
-      {error ? <p className="mt-2 text-sm text-[#ff6b6b]">{error}</p> : null}
+      {error ? <p className="mt-2 text-sm text-danger">{error}</p> : null}
     </div>
   );
 }

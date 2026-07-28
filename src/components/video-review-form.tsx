@@ -72,16 +72,16 @@ export function VideoReviewForm({ videoId, initialRating = 5, initialComment = "
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-[10px] border border-[#30363d] bg-[#161b22] p-5">
-      <h2 className="text-xl font-semibold">Laisser une note et un commentaire</h2>
-      <p className="mt-1 text-sm text-[#8b949e]">Tu peux modifier ton avis plus tard{hasExistingReview ? " ou le supprimer" : ""}.</p>
+    <form onSubmit={onSubmit} className="rounded-md border border-line bg-surface p-5 shadow-resting">
+      <h2 className="text-xl font-semibold text-ink">Laisser une note et un commentaire</h2>
+      <p className="mt-1 text-sm text-ink-muted">Tu peux modifier ton avis plus tard{hasExistingReview ? " ou le supprimer" : ""}.</p>
 
-      <label className="mt-4 grid gap-1 text-sm text-[#8b949e]">
+      <label className="mt-4 grid gap-1 text-sm text-ink-muted">
         <span>Note</span>
         <select
           value={rating}
           onChange={(event) => setRating(Number(event.target.value))}
-          className="rounded-lg border border-[#30363d] bg-[#21262d] px-3 py-2 text-sm text-[#e6edf3]"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
         >
           <option value={5}>5 / 5</option>
           <option value={4}>4 / 5</option>
@@ -91,7 +91,7 @@ export function VideoReviewForm({ videoId, initialRating = 5, initialComment = "
         </select>
       </label>
 
-      <label className="mt-3 grid gap-1 text-sm text-[#8b949e]">
+      <label className="mt-3 grid gap-1 text-sm text-ink-muted">
         <span>Commentaire</span>
         <textarea
           value={comment}
@@ -100,7 +100,7 @@ export function VideoReviewForm({ videoId, initialRating = 5, initialComment = "
           minLength={3}
           maxLength={1200}
           rows={4}
-          className="rounded-lg border border-[#30363d] bg-[#21262d] px-3 py-2 text-sm text-[#e6edf3]"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
         />
       </label>
 
@@ -108,7 +108,7 @@ export function VideoReviewForm({ videoId, initialRating = 5, initialComment = "
         <button
           type="submit"
           disabled={isLoading || isDeleting}
-          className="rounded-[8px] bg-[#f5c842] px-5 py-2 font-semibold text-[#0d1117] hover:bg-[#e6b83a] disabled:opacity-60"
+          className="rounded-sm bg-accent px-5 py-2 font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60"
         >
           {isLoading ? "Enregistrement..." : hasExistingReview ? "Mettre a jour mon avis" : "Enregistrer mon avis"}
         </button>
@@ -118,15 +118,15 @@ export function VideoReviewForm({ videoId, initialRating = 5, initialComment = "
             type="button"
             onClick={onDelete}
             disabled={isLoading || isDeleting}
-            className="rounded-[8px] border border-[#30363d] bg-[#21262d] px-5 py-2 font-semibold text-[#e6edf3] hover:bg-[#30363d] disabled:opacity-60"
+            className="rounded-sm border border-line bg-surface-alt px-5 py-2 font-semibold text-ink transition-colors hover:bg-line disabled:opacity-60"
           >
             {isDeleting ? "Suppression..." : "Supprimer mon avis"}
           </button>
         ) : null}
       </div>
 
-      {error ? <p className="mt-3 text-sm text-[#ff6b6b]">{error}</p> : null}
-      {success ? <p className="mt-3 text-sm text-[#b6f0c2]">{success}</p> : null}
+      {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
+      {success ? <p className="mt-3 text-sm text-success">{success}</p> : null}
     </form>
   );
 }

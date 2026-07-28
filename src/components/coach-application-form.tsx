@@ -73,79 +73,79 @@ export function CoachApplicationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-2xl border border-white/10 bg-[#12161b]/80 p-6">
+    <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-md border border-line bg-surface shadow-resting p-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Nom complet
           <input
             value={form.fullName}
             onChange={(event) => updateField("fullName", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             required
           />
         </label>
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Classement (optionnel)
           <input
             value={form.ranking}
             onChange={(event) => updateField("ranking", event.target.value)}
             placeholder="Ex. N3, R2..."
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
           />
         </label>
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Club (optionnel)
           <input
             value={form.club}
             onChange={(event) => updateField("club", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
           />
         </label>
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Lien vers une video demo (optionnel)
           <input
             type="url"
             value={form.videoUrl}
             onChange={(event) => updateField("videoUrl", event.target.value)}
             placeholder="https://..."
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
           />
         </label>
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Adresse
           <input
             value={form.address}
             onChange={(event) => updateField("address", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             required
           />
         </label>
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Telephone
           <input
             value={form.phone}
             onChange={(event) => updateField("phone", event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             required
           />
         </label>
       </div>
 
-      <label className="block text-sm text-[#b8c1cd]">
+      <label className="block text-sm text-ink-muted">
         Message (optionnel)
         <textarea
           value={form.message}
           onChange={(event) => updateField("message", event.target.value)}
-          className="mt-1 min-h-24 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+          className="mt-1 min-h-24 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
         />
       </label>
 
-      {error ? <p className="text-sm text-[#ff6b6b]">{error}</p> : null}
+      {error ? <p className="text-sm text-danger">{error}</p> : null}
 
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full rounded-full bg-[#F5C842] px-4 py-2 font-semibold text-[#161B22] hover:bg-[#f0ba1f] disabled:opacity-60"
+        className="w-full rounded-full bg-accent px-4 py-2 font-semibold text-white hover:bg-accent-deep disabled:opacity-60"
       >
         {isLoading ? "Envoi..." : "Envoyer ma candidature"}
       </button>

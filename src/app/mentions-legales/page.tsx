@@ -57,7 +57,7 @@ export default function MentionsLegalesPage() {
       <h2>Donnees personnelles</h2>
       <p>
         Le traitement des donnees personnelles des utilisateurs du site est decrit dans la{" "}
-        <a href="/confidentialite" className="underline hover:text-white">
+        <a href="/confidentialite" className="underline hover:text-ink">
           politique de confidentialite
         </a>
         .

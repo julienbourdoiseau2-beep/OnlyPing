@@ -21,3 +21,7 @@
 .DS_Store
 *.log
 tsconfig.tsbuildinfo
+
+# local agent/skill tooling (vendored, reproducible via skills-lock.json)
+/.agents
+/.claude

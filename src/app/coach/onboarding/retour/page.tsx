@@ -21,11 +21,11 @@ export default async function CoachOnboardingReturnPage() {
     return (
       <section className="mx-auto max-w-lg px-3 sm:px-4 py-12">
         <h1 className="text-4xl font-bold">Compte de paiement</h1>
-        <p className="mt-4 text-sm text-[#ff8c42]">
+        <p className="mt-4 text-sm text-danger">
           Aucune configuration de compte de paiement n&apos;a ete trouvee. Lance l&apos;onboarding depuis ton tableau de
           bord.
         </p>
-        <Link href="/dashboard" className="mt-6 inline-block text-sm text-[#cfd6df] hover:text-white">
+        <Link href="/dashboard" className="mt-6 inline-block text-sm text-ink-muted hover:text-ink">
           Retour au tableau de bord
         </Link>
       </section>
@@ -54,13 +54,13 @@ export default async function CoachOnboardingReturnPage() {
     <section className="mx-auto max-w-lg px-3 sm:px-4 py-12">
       <h1 className="text-4xl font-bold">Compte de paiement</h1>
 
-      <div className="mt-8 space-y-4 rounded-2xl border border-white/10 bg-[#12161b]/80 p-6">
+      <div className="mt-8 space-y-4 rounded-md border border-line bg-surface shadow-resting p-6">
         {isFullyActive ? (
-          <p className="text-sm text-[#90e0ef]">Compte valide, tu peux publier des videos.</p>
+          <p className="text-sm text-success">Compte valide, tu peux publier des videos.</p>
         ) : (
           <>
-            <p className="text-sm text-[#ff8c42]">Il reste des informations a completer sur ton compte de paiement.</p>
-            <ul className="space-y-1 text-xs text-[#b8c1cd]">
+            <p className="text-sm text-danger">Il reste des informations a completer sur ton compte de paiement.</p>
+            <ul className="space-y-1 text-xs text-ink-muted">
               <li>Paiements entrants : {chargesEnabled ? "actives" : "en attente"}</li>
               <li>Versements : {payoutsEnabled ? "actives" : "en attente"}</li>
               <li>Informations soumises : {detailsSubmitted ? "oui" : "non"}</li>
@@ -70,7 +70,7 @@ export default async function CoachOnboardingReturnPage() {
         )}
 
         <div className="pt-2">
-          <Link href="/dashboard" className="text-sm text-[#cfd6df] hover:text-white">
+          <Link href="/dashboard" className="text-sm text-ink-muted hover:text-ink">
             Retour au tableau de bord
           </Link>
         </div>

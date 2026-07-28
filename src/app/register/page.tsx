@@ -60,68 +60,68 @@ export default function RegisterPage() {
   return (
     <section className="mx-auto max-w-lg px-3 sm:px-4 py-12">
       <h1 className="text-4xl font-bold">Creer un compte</h1>
-      <p className="mt-2 text-[#b8c1cd]">Inscris-toi pour acheter et lire tes videos techniques.</p>
+      <p className="mt-2 text-ink-muted">Inscris-toi pour acheter et lire tes videos techniques.</p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-2xl border border-white/10 bg-[#12161b]/80 p-6">
-        <label className="block text-sm text-[#b8c1cd]">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-md border border-line bg-surface shadow-resting p-6">
+        <label className="block text-sm text-ink-muted">
           Nom
           <input
             type="text"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             required
           />
         </label>
 
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Email
           <input
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             required
           />
         </label>
 
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Mot de passe
           <input
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             minLength={8}
             required
           />
         </label>
 
-        <label className="block text-sm text-[#b8c1cd]">
+        <label className="block text-sm text-ink-muted">
           Confirmer le mot de passe
           <input
             type="password"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] outline-none focus:border-white/35"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             minLength={8}
             required
           />
         </label>
 
-        {error ? <p className="text-sm text-[#ff6b6b]">{error}</p> : null}
+        {error ? <p className="text-sm text-danger">{error}</p> : null}
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-full border border-white/20 bg-[#2d3540] px-4 py-2 font-semibold text-[#edf1f6] hover:bg-[#3a4452] disabled:opacity-60"
+          className="w-full rounded-full bg-accent px-4 py-2 font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60"
         >
           {isLoading ? "Creation..." : "Creer mon compte"}
         </button>
       </form>
 
-      <p className="mt-4 text-sm text-[#b8c1cd]">
-        Deja inscrit ? <Link className="text-[#cfd6df] hover:text-white" href="/login">Connecte-toi</Link>
+      <p className="mt-4 text-sm text-ink-muted">
+        Deja inscrit ? <Link className="text-ink-muted hover:text-ink" href="/login">Connecte-toi</Link>
       </p>
     </section>
   );

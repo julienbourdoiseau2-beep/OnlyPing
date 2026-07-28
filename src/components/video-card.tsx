@@ -32,12 +32,12 @@ function categoryLabel(category: string) {
 
 function categoryBadgeClass(category: string) {
   if (category === "REVERS") {
-    return "bg-[#1c3a2a] text-[#52b788]";
+    return "bg-chip-revers-bg text-chip-revers-text";
   }
   if (category === "COUP_DROIT") {
-    return "bg-[#2a1515] text-[#e05c5c]";
+    return "bg-chip-coupdroit-bg text-chip-coupdroit-text";
   }
-  return "bg-[#2a2010] text-[#f5c842]";
+  return "bg-chip-service-bg text-chip-service-text";
 }
 
 export function VideoCard({ id, title, thumbnail, category, level, durationMin, priceCents, averageRating, reviewCount, coachName, coachAvatarUrl }: VideoCardProps) {
@@ -45,9 +45,9 @@ export function VideoCard({ id, title, thumbnail, category, level, durationMin, 
   const showThumbnail = Boolean(thumbnail && thumbnail !== "/uploads/default-thumb.jpg");
 
   return (
-    <article className="group rounded-[10px] border border-[#30363d] bg-[#161b22] p-4 transition hover:border-[#f5c842]">
+    <article className="group rounded-md border border-line bg-surface p-4 shadow-resting transition hover:-translate-y-0.5 hover:shadow-raised">
       {showThumbnail ? (
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px]">
+        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm">
           <Image
             fill
             unoptimized={shouldUseUnoptimizedImage(thumbnail)}
@@ -65,9 +65,9 @@ export function VideoCard({ id, title, thumbnail, category, level, durationMin, 
         </span>
       </div>
 
-      <p className="mt-2 text-xs uppercase tracking-wider text-[#8b949e]">{toLevelLabel(level)}</p>
-      <h3 className="mt-2 text-lg font-semibold text-[#e6edf3]">{title}</h3>
-      <div className="mt-2 flex items-center gap-2 text-sm text-[#8b949e]">
+      <p className="mt-2 text-xs uppercase tracking-wider text-ink-muted">{toLevelLabel(level)}</p>
+      <h3 className="mt-2 text-lg font-semibold text-ink">{title}</h3>
+      <div className="mt-2 flex items-center gap-2 text-sm text-ink-muted">
         {coachAvatarUrl ? (
           <Image
             unoptimized={shouldUseUnoptimizedImage(coachAvatarUrl)}
@@ -80,16 +80,16 @@ export function VideoCard({ id, title, thumbnail, category, level, durationMin, 
         ) : null}
         <p>Par {coachName}</p>
       </div>
-      <p className="mt-1 text-sm text-[#8b949e]">{durationMin} min</p>
-      <p className="mt-1 text-sm text-[#8b949e]">
+      <p className="mt-1 text-sm text-ink-muted">{durationMin} min</p>
+      <p className="mt-1 text-sm text-ink-muted">
         {averageRating === null ? "Pas encore d'avis" : `${averageRating.toFixed(1)} / 5`} · {reviewCount} avis
       </p>
 
       <div className="mt-5 flex items-center justify-between">
-        <span className="text-xl font-bold text-[#f5c842]">{euroPrice} EUR</span>
+        <span className="text-xl font-bold text-accent">{euroPrice} EUR</span>
         <Link
           href={`/videos/${id}`}
-          className="rounded-[8px] bg-[#f5c842] px-3 py-1.5 text-sm font-semibold text-[#0d1117] transition hover:bg-[#e6b83a]"
+          className="rounded-sm bg-accent px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-deep"
         >
           Voir
         </Link>

@@ -1,16 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
   variable: "--font-display"
 });
 
-const bodyFont = Poppins({
+const bodyFont = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body"
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "OnlyPing"
   },
   formatDetection: {
@@ -43,8 +43,23 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#1f6feb"
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f7fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0f1c" }
+  ]
 };
+
+const themeInitScript = `
+(function () {
+  try {
+    var stored = window.localStorage.getItem("onlyping-theme");
+    var theme = stored === "dark" || stored === "light"
+      ? stored
+      : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {}
+})();
+`;
 
 export default function RootLayout({
   children
@@ -53,11 +68,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${displayFont.variable} ${bodyFont.variable}`}>
-      <body>
+      <body className="bg-bg text-ink">
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <Providers>
           <SiteHeader />
           <main>{children}</main>
-          <SiteFooter />
         </Providers>
       </body>
     </html>

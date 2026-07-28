@@ -119,12 +119,12 @@ export default async function DashboardPage() {
   return (
     <section className="mx-auto max-w-6xl px-3 sm:px-4 py-12">
       <h1 className="text-4xl font-bold">Espace entraineur</h1>
-      <p className="mt-2 text-[#b8c1cd]">Bienvenue {session.user.name}, voici tes videos.</p>
+      <p className="mt-2 text-ink-muted">Bienvenue {session.user.name}, voici tes videos.</p>
 
       {!canPublish ? (
-        <div className="mt-6 rounded-2xl border border-[#ff8c42]/30 bg-[#ff8c42]/10 p-5">
-          <p className="text-sm font-semibold text-[#ff8c42]">Compte de paiement a configurer</p>
-          <p className="mt-1 text-sm text-[#b8c1cd]">
+        <div className="mt-6 rounded-md border border-danger/30 bg-danger-bg p-5">
+          <p className="text-sm font-semibold text-danger">Compte de paiement a configurer</p>
+          <p className="mt-1 text-sm text-ink-muted">
             Publier une video necessite un compte de paiement Stripe pleinement active (paiements entrants et
             versements). Configure-le pour pouvoir publier tes videos et recevoir tes gains.
           </p>
@@ -135,32 +135,32 @@ export default async function DashboardPage() {
       ) : null}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Ventes</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">Ventes</p>
           <p className="mt-2 text-3xl font-bold">{purchases.length}</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">CA brut</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">CA brut</p>
           <p className="mt-2 text-3xl font-bold">{(grossCents / 100).toFixed(2)} EUR</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Commission plateforme</p>
-          <p className="mt-2 text-3xl font-bold text-[#e2e8f0]">{(commissionCents / 100).toFixed(2)} EUR</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">Commission plateforme</p>
+          <p className="mt-2 text-3xl font-bold text-ink-muted">{(commissionCents / 100).toFixed(2)} EUR</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Gain reel</p>
-          <p className="mt-2 text-3xl font-bold text-[#e2e8f0]">{(netCents / 100).toFixed(2)} EUR</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">Gain reel</p>
+          <p className="mt-2 text-3xl font-bold text-ink-muted">{(netCents / 100).toFixed(2)} EUR</p>
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-[#8b949e]">
+      <p className="mt-3 text-xs text-ink-muted">
         Ta part est versee automatiquement sur ton compte Stripe a chaque vente, au taux de commission indique pour
         chaque video ci-dessous.
       </p>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
+      <div className="mt-6 overflow-hidden rounded-md border border-line bg-surface shadow-resting">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/5 text-[#cbd3dd]">
+          <thead className="bg-surface-alt text-ink-muted">
             <tr>
               <th className="px-4 py-3">Mois</th>
               <th className="px-4 py-3">Ventes</th>
@@ -172,11 +172,11 @@ export default async function DashboardPage() {
           <tbody>
             {monthlyRows.length === 0 ? (
               <tr>
-                <td className="px-4 py-3 text-[#94a3b8]" colSpan={5}>Aucune vente pour le moment.</td>
+                <td className="px-4 py-3 text-ink-muted" colSpan={5}>Aucune vente pour le moment.</td>
               </tr>
             ) : (
               monthlyRows.map((row) => (
-                <tr key={row.month} className="border-t border-white/10">
+                <tr key={row.month} className="border-t border-line">
                   <td className="px-4 py-3">{row.month}</td>
                   <td className="px-4 py-3">{row.sales}</td>
                   <td className="px-4 py-3">{(row.gross / 100).toFixed(2)} EUR</td>
@@ -190,9 +190,9 @@ export default async function DashboardPage() {
       </div>
 
       <h2 className="mt-10 text-2xl font-semibold">Ventes par video</h2>
-      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
+      <div className="mt-4 overflow-hidden rounded-md border border-line bg-surface shadow-resting">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/5 text-[#cbd3dd]">
+          <thead className="bg-surface-alt text-ink-muted">
             <tr>
               <th className="px-4 py-3">Video</th>
               <th className="px-4 py-3">Ventes</th>
@@ -204,11 +204,11 @@ export default async function DashboardPage() {
           <tbody>
             {videoSalesRows.length === 0 ? (
               <tr>
-                <td className="px-4 py-3 text-[#94a3b8]" colSpan={5}>Aucune vente pour le moment.</td>
+                <td className="px-4 py-3 text-ink-muted" colSpan={5}>Aucune vente pour le moment.</td>
               </tr>
             ) : (
               videoSalesRows.map((row) => (
-                <tr key={row.videoId} className="border-t border-white/10">
+                <tr key={row.videoId} className="border-t border-line">
                   <td className="px-4 py-3">{row.title}</td>
                   <td className="px-4 py-3">{row.sales}</td>
                   <td className="px-4 py-3">{(row.gross / 100).toFixed(2)} EUR</td>
@@ -244,10 +244,10 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="mt-8 hidden overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80 md:block">
+      <div className="mt-8 hidden overflow-hidden rounded-md border border-line bg-surface shadow-resting md:block">
         <div className="overflow-x-auto">
           <table className="min-w-[980px] text-left text-sm">
-            <thead className="bg-white/5 text-[#cbd3dd]">
+            <thead className="bg-surface-alt text-ink-muted">
               <tr>
                 <th className="px-4 py-3">Titre</th>
                 <th className="px-4 py-3">Categorie</th>
@@ -260,7 +260,7 @@ export default async function DashboardPage() {
             </thead>
             <tbody>
               {videos.map((video) => (
-                <tr key={video.id} className="border-t border-white/10">
+                <tr key={video.id} className="border-t border-line">
                   <td className="px-4 py-3">{video.title}</td>
                   <td className="px-4 py-3">{video.category}</td>
                   <td className="px-4 py-3">{toLevelLabel(video.level)}</td>

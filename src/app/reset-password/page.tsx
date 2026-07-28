@@ -55,46 +55,46 @@ function ResetPasswordPageContent() {
   return (
     <section className="mx-auto max-w-lg px-3 sm:px-4 py-12">
       <h1 className="text-4xl font-bold">Nouveau mot de passe</h1>
-      <p className="mt-2 text-[#cbd5e1]">Definis un nouveau mot de passe pour ton compte.</p>
+      <p className="mt-2 text-ink-muted">Definis un nouveau mot de passe pour ton compte.</p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-2xl border border-white/10 bg-black/30 p-6">
-        <label className="block text-sm text-[#cbd5e1]">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4 rounded-md border border-line bg-surface p-6 shadow-resting">
+        <label className="block text-sm text-ink-muted">
           Nouveau mot de passe
           <input
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#f8fafc] outline-none focus:border-[#48cae4]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             minLength={8}
             required
           />
         </label>
 
-        <label className="block text-sm text-[#cbd5e1]">
+        <label className="block text-sm text-ink-muted">
           Confirmer le mot de passe
           <input
             type="password"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#f8fafc] outline-none focus:border-[#48cae4]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink outline-none focus:border-accent"
             minLength={8}
             required
           />
         </label>
 
-        {error ? <p className="text-sm text-[#ff6b6b]">{error}</p> : null}
+        {error ? <p className="text-sm text-danger">{error}</p> : null}
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-full bg-[#00b4d8] px-4 py-2 font-semibold text-[#04111d] hover:bg-[#48cae4] disabled:opacity-60"
+          className="w-full rounded-full bg-accent px-4 py-2 font-semibold text-white transition-colors hover:bg-accent-deep disabled:opacity-60"
         >
           {isLoading ? "Mise a jour..." : "Mettre a jour"}
         </button>
       </form>
 
-      <p className="mt-4 text-sm text-[#cbd5e1]">
-        Retour a la connexion? <Link className="text-[#90e0ef] hover:text-[#48cae4]" href="/login">Connecte-toi</Link>
+      <p className="mt-4 text-sm text-ink-muted">
+        Retour a la connexion? <Link className="text-accent hover:text-accent-deep" href="/login">Connecte-toi</Link>
       </p>
     </section>
   );

@@ -87,18 +87,18 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
 
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-12">
-      <h1 className="text-4xl font-bold">Catalogue des videos</h1>
-      <p className="mt-2 text-[#8b949e]">
+      <h1 className="font-display text-4xl font-semibold text-ink">Catalogue des videos</h1>
+      <p className="mt-2 text-ink-muted">
         Choisis ta prochaine seance selon ton niveau et travaille avec les methodes des entraineurs.
       </p>
 
-      <form className="mt-6 grid gap-3 rounded-[10px] border border-[#30363d] bg-[#161b22] p-4 md:grid-cols-5 md:items-end">
-        <label className="text-sm text-[#8b949e]">
+      <form className="mt-6 grid gap-3 rounded-md border border-line bg-surface p-4 shadow-resting md:grid-cols-5 md:items-end">
+        <label className="text-sm text-ink-muted">
           Entraineur
           <select
             name="coachId"
             defaultValue={coachId}
-            className="mt-1 w-full rounded-[10px] border border-[#30363d] bg-[#21262d] px-3 py-2 text-sm text-[#e6edf3]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
           >
             <option value="">Tous les entraineurs</option>
             {coaches.map((coach) => (
@@ -109,12 +109,12 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
           </select>
         </label>
 
-        <label className="text-sm text-[#8b949e]">
+        <label className="text-sm text-ink-muted">
           Categorie
           <select
             name="category"
             defaultValue={category}
-            className="mt-1 w-full rounded-[10px] border border-[#30363d] bg-[#21262d] px-3 py-2 text-sm text-[#e6edf3]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
           >
             {categories.map((item) => (
               <option key={item.label} value={item.value}>
@@ -124,12 +124,12 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
           </select>
         </label>
 
-        <label className="text-sm text-[#8b949e]">
+        <label className="text-sm text-ink-muted">
           Niveau
           <select
             name="level"
             defaultValue={level}
-            className="mt-1 w-full rounded-[10px] border border-[#30363d] bg-[#21262d] px-3 py-2 text-sm text-[#e6edf3]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
           >
             <option value="">Tous les niveaux</option>
             {VIDEO_LEVEL_VALUES.map((item) => (
@@ -142,14 +142,14 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
 
         <button
           type="submit"
-          className="rounded-[8px] bg-[#f5c842] px-5 py-2 font-semibold text-[#0d1117] hover:bg-[#e6b83a]"
+          className="rounded-sm bg-accent px-5 py-2 font-semibold text-white transition-colors hover:bg-accent-deep"
         >
           Filtrer
         </button>
 
         <a
           href="/catalogue"
-          className="inline-flex items-center justify-center rounded-[8px] border border-[#30363d] bg-[#21262d] px-5 py-2 text-sm font-medium text-[#e6edf3] hover:bg-[#161b22]"
+          className="inline-flex items-center justify-center rounded-sm border border-line bg-surface-alt px-5 py-2 text-sm font-medium text-ink transition-colors hover:bg-line"
         >
           Reinitialiser
         </a>
@@ -180,7 +180,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
         })}
       </div>
 
-      {videos.length === 0 ? <p className="mt-6 text-sm text-[#8b949e]">Aucune video pour ces filtres.</p> : null}
+      {videos.length === 0 ? <p className="mt-6 text-sm text-ink-muted">Aucune video pour ces filtres.</p> : null}
     </section>
   );
 }

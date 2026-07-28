@@ -202,21 +202,21 @@ export function CoachUploadForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
+    <form onSubmit={onSubmit} className="rounded-md border border-line bg-surface shadow-resting p-5">
       <h2 className="text-2xl font-semibold">Ajouter une video</h2>
-      <p className="mt-1 text-sm text-[#b8c1cd]">Le stockage est gere automatiquement (R2 en production, local en fallback).</p>
+      <p className="mt-1 text-sm text-ink-muted">Le stockage est gere automatiquement (R2 en production, local en fallback).</p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <input
           name="title"
           required
           placeholder="Titre"
-          className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         />
         <select
           name="level"
           defaultValue="INTERMEDIAIRE"
-          className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         >
           {VIDEO_LEVEL_VALUES.map((level) => (
             <option key={level} value={level}>
@@ -227,7 +227,7 @@ export function CoachUploadForm() {
         <select
           name="category"
           defaultValue="SERVICE"
-          className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         >
           <option value="SERVICE">Service</option>
           <option value="REVERS">Revers</option>
@@ -239,7 +239,7 @@ export function CoachUploadForm() {
           min={1}
           required
           placeholder="Duree (min)"
-          className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         />
         <input
           name="priceEuros"
@@ -250,7 +250,7 @@ export function CoachUploadForm() {
           value={priceEuros}
           onChange={(event) => setPriceEuros(event.target.value)}
           placeholder="Prix en euros (ex: 19.90)"
-          className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
+          className="rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         />
       </div>
 
@@ -258,51 +258,51 @@ export function CoachUploadForm() {
         name="description"
         required
         placeholder="Description technique"
-        className="mt-3 min-h-24 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
+        className="mt-3 min-h-24 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
       />
 
-      <label className="mt-3 block text-xs text-[#b8c1cd]">
+      <label className="mt-3 block text-xs text-ink-muted">
         URL miniature (image, optionnel)
         <input
           name="thumbnail"
           placeholder="https://..."
-          className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] outline-none focus:border-white/35"
+          className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
         />
       </label>
 
-      <label className="mt-3 block text-xs text-[#b8c1cd]">
+      <label className="mt-3 block text-xs text-ink-muted">
         Fichier miniature (image)
         <input
           name="thumbnailFile"
           type="file"
           accept="image/png,image/jpeg,image/webp,image/avif"
-          className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] file:mr-3 file:rounded file:border-0 file:bg-[#3a4452] file:px-3 file:py-1 file:text-[#edf1f6]"
+          className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink file:mr-3 file:rounded-sm file:border-0 file:bg-line file:px-3 file:py-1 file:text-ink"
         />
       </label>
 
-      <label className="mt-3 block text-xs text-[#b8c1cd]">
+      <label className="mt-3 block text-xs text-ink-muted">
         Fichier video (obligatoire)
         <input
           name="video"
           type="file"
           accept="video/mp4,video/webm,video/quicktime"
           required
-          className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6] file:mr-3 file:rounded file:border-0 file:bg-[#3a4452] file:px-3 file:py-1 file:text-[#edf1f6]"
+          className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink file:mr-3 file:rounded-sm file:border-0 file:bg-line file:px-3 file:py-1 file:text-ink"
         />
       </label>
 
-      {error ? <p className="mt-3 text-sm text-[#ff6b6b]">{error}</p> : null}
-      {success ? <p className="mt-3 text-sm text-[#d7dde5]">{success}</p> : null}
+      {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
+      {success ? <p className="mt-3 text-sm text-ink-muted">{success}</p> : null}
 
       {isLoading ? (
-        <div className="mt-3 rounded-lg border border-white/20 bg-white/5 p-3">
-          <div className="flex items-center justify-between text-xs text-[#b8c1cd]">
+        <div className="mt-3 rounded-sm border border-line bg-surface-alt p-3">
+          <div className="flex items-center justify-between text-xs text-ink-muted">
             <span>{uploadStep || "Traitement..."}</span>
             <span>{uploadProgress !== null ? `${uploadProgress}%` : "..."}</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-alt">
             <div
-              className="h-full bg-[#f5c842] transition-all duration-200"
+              className="h-full bg-accent transition-all duration-200"
               style={{ width: `${uploadProgress ?? 15}%` }}
             />
           </div>
@@ -312,7 +312,7 @@ export function CoachUploadForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="mt-4 rounded-lg bg-[#f5c842] px-5 py-2 font-semibold text-[#0d1117] hover:bg-[#e6b83a] disabled:opacity-60"
+        className="mt-4 rounded-sm bg-accent px-5 py-2 font-semibold text-white hover:bg-accent-deep disabled:opacity-60"
       >
         {isLoading ? "Upload..." : "Creer la video"}
       </button>

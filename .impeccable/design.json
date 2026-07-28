@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-28T00:00:00.000Z",
+  "title": "Design System: OnlyPing",
+  "extensions": {
+    "colorMeta": {
+      "accent": { "role": "primary", "displayName": "Accent (Match Orange)", "canonical": "#E8672E", "tonalRamp": ["#3A1B0C", "#5C2C13", "#8A421D", "#B85427", "#D1551F", "#E8672E", "#FF7A3D", "#FFB38A"] },
+      "bg": { "role": "neutral", "displayName": "Bg", "canonical": "#F6F7FB", "tonalRamp": ["#0A0F1C", "#121A2B", "#1A2338", "#232D45", "#5B6478", "#8A93A6", "#E2E6EE", "#F6F7FB"] },
+      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "#FFFFFF", "tonalRamp": ["#121A2B", "#1A2338", "#232D45", "#5B6478", "#8A93A6", "#E2E6EE", "#EEF1F6", "#FFFFFF"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#10182B", "tonalRamp": ["#10182B", "#232D45", "#5B6478", "#8A93A6", "#B7BECB", "#DCE0E8", "#EEF1F6", "#EAF0FA"] },
+      "success": { "role": "tertiary", "displayName": "Success", "canonical": "#1F9D55", "tonalRamp": ["#0F2A1E", "#16301F", "#1F9D55", "#34D399", "#6FE3B4", "#B7F3D8", "#E7F6ED", "#F3FBF7"] },
+      "danger": { "role": "error", "displayName": "Danger", "canonical": "#DC2626", "tonalRamp": ["#3A1414", "#5C1717", "#991B1B", "#DC2626", "#F87171", "#FCA5A5", "#FDECEC", "#FEF4F4"] },
+      "info": { "role": "secondary", "displayName": "Info", "canonical": "#2563EB", "tonalRamp": ["#16223D", "#1B2740", "#1E3A8A", "#2563EB", "#60A5FA", "#93C5FD", "#E7EEFC", "#F2F6FE"] },
+      "chip-service": { "role": "tertiary", "displayName": "Service Blue", "canonical": "#2C4C9B", "tonalRamp": ["#1B2740", "#22345C", "#2C4C9B", "#4C6FC7", "#8FB0F5", "#C3D4FA", "#E7EEFC", "#F3F7FE"] },
+      "chip-revers": { "role": "tertiary", "displayName": "Revers Green", "canonical": "#1F7A45", "tonalRamp": ["#16301F", "#1B4A2C", "#1F7A45", "#2FA560", "#66D394", "#A6EAC1", "#E6F5EC", "#F2FBF6"] },
+      "chip-coupdroit": { "role": "tertiary", "displayName": "Coup Droit Violet", "canonical": "#6B3FA0", "tonalRamp": ["#2A1B3D", "#402C5C", "#6B3FA0", "#8E5CC9", "#C79EF0", "#DFC5F7", "#F1E9FC", "#F8F2FD"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headline and h1–h3 across the app (Space Grotesk)." },
+      "body": { "displayName": "Body", "purpose": "All running text, labels, and UI copy (Inter, 400–600)." }
+    },
+    "shadows": [
+      { "name": "resting", "value": "0 1px 2px rgba(16,24,43,0.04), 0 1px 1px rgba(16,24,43,0.03)", "purpose": "Default card/panel elevation in light theme; in dark theme depth relies on surface/bg contrast instead." },
+      { "name": "raised", "value": "0 12px 28px rgba(16,24,43,0.10)", "purpose": "Hover lift on interactive cards and the sticky header once scrolled." }
+    ],
+    "motion": [
+      { "name": "transition-fast", "value": "150ms ease", "purpose": "Default duration for color, border, and shadow transitions on interactive elements." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action; accent fill, used once per view.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Voir</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; background: #E8672E; color: #ffffff; font-weight: 600; font-size: 0.875rem; padding: 12px 24px; border-radius: 9999px; border: none; transition: background 150ms ease, box-shadow 150ms ease; } .ds-btn-primary:hover { background: #D1551F; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(232,103,46,0.3); }"
+    },
+    {
+      "name": "Video Card",
+      "kind": "card",
+      "refersTo": "card-video",
+      "description": "Signature component: catalogue video tile with soft elevation, hover lift, accent price/CTA.",
+      "html": "<article class=\"ds-card-video\"><span class=\"ds-card-video__badge\">Service</span><h3 class=\"ds-card-video__title\">Topspin coup droit</h3><p class=\"ds-card-video__meta\">12 min</p><div class=\"ds-card-video__footer\"><span class=\"ds-card-video__price\">19.90 EUR</span><a class=\"ds-btn-primary\" href=\"#\">Voir</a></div></article>",
+      "css": ".ds-card-video { display: block; background: #ffffff; border: 1px solid #E2E6EE; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(16,24,43,0.04); transition: box-shadow 150ms ease, transform 150ms ease; } .ds-card-video:hover { box-shadow: 0 12px 28px rgba(16,24,43,0.10); transform: translateY(-2px); } .ds-card-video__badge { display: inline-flex; background: #E7EEFC; color: #2C4C9B; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 9999px; } .ds-card-video__title { margin-top: 8px; color: #10182B; font-size: 1.125rem; font-weight: 600; } .ds-card-video__meta { margin-top: 4px; color: #5B6478; font-size: 0.875rem; } .ds-card-video__footer { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; } .ds-card-video__price { color: #E8672E; font-size: 1.25rem; font-weight: 700; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Form field used across login/register/profile.",
+      "html": "<input class=\"ds-input\" type=\"email\" placeholder=\"Email\" />",
+      "css": ".ds-input { width: 100%; background: #EEF1F6; border: 1px solid #E2E6EE; border-radius: 8px; padding: 8px 12px; color: #10182B; transition: border-color 150ms ease, box-shadow 150ms ease; } .ds-input::placeholder { color: #8A93A6; } .ds-input:focus { outline: none; border-color: #E8672E; box-shadow: 0 0 0 3px rgba(232,103,46,0.15); }"
+    },
+    {
+      "name": "Theme Toggle",
+      "kind": "custom",
+      "refersTo": "theme-toggle",
+      "description": "Sun/moon pill switch in the header that toggles light/dark and persists to localStorage.",
+      "html": "<button class=\"ds-theme-toggle\" aria-label=\"Changer de theme\"><span class=\"ds-theme-toggle__thumb\"></span></button>",
+      "css": ".ds-theme-toggle { position: relative; width: 44px; height: 24px; border-radius: 9999px; background: #EEF1F6; border: 1px solid #E2E6EE; cursor: pointer; } .ds-theme-toggle__thumb { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 9999px; background: #10182B; transition: transform 150ms ease; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Center Line",
+    "overview": "OnlyPing is redesigned around the one line that structures every ping-pong table: the center line. The product becomes a clean, well-lit, structured surface — closer to a modern sport-tech SaaS dashboard than the previous dim graphite room — because the audience is not just spectators, it's players and coaches doing a job (browsing, buying, publishing, managing payouts). Structure and legibility lead; energy is reserved for one color.\n\nThat one color is a competition-ball orange: Accent. Everything else is quiet — neutral surfaces, a calm navy-black ink, soft dividing lines — so that price tags, primary actions, and active states read instantly as \"the thing to do here.\" Light and dark are both first-class: the same structure, ink and accent hold in both, only the surface/background values invert.",
+    "keyCharacteristics": [
+      "Structured, editorial-grade neutrals with a true light theme and a true dark theme, switchable by the user.",
+      "One saturated accent — competition-ball orange — spent only on price, primary actions, and active/selected states.",
+      "Soft, restrained elevation (gentle shadows on cards) instead of flat borders alone.",
+      "Geometric display type (Space Grotesk) over a neutral, highly-legible body face (Inter) — professional, not playful."
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Orange marks the single decisive element per view: a price, the primary CTA, an active tab/filter, a focus ring. If two elements compete for it, one loses the accent.", "section": "colors" },
+      { "name": "The Invert, Don't Recolor Rule", "body": "Moving between light and dark never changes which token a component uses — only what bg/surface/ink resolve to.", "section": "colors" },
+      { "name": "The Quiet Lift Rule", "body": "Elevation communicates interactivity, not decoration: only elements a user can act on lift on hover.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do spend Accent on exactly one decisive element per view — The One Accent Rule.",
+      "Do author every component against the semantic tokens so it inverts correctly between light and dark automatically.",
+      "Do give interactive cards a hover lift; keep static panels at Resting."
+    ],
+    "donts": [
+      "Don't reintroduce the previous graphite/gold palette or the flat-only, border-as-only-depth system.",
+      "Don't use Accent for category chips or status tags; they stay in their own quiet tint family.",
+      "Don't hardcode a hex color in a component; every color must resolve through a semantic token."
+    ]
+  }
+}

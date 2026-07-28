@@ -67,7 +67,7 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
     return (
       <section className="mx-auto max-w-5xl px-3 sm:px-4 py-12">
         <h1 className="text-4xl font-bold">Dashboard admin achats</h1>
-        <p className="mt-2 text-[#b8c1cd]">Connecte-toi pour acceder a cette page.</p>
+        <p className="mt-2 text-ink-muted">Connecte-toi pour acceder a cette page.</p>
       </section>
     );
   }
@@ -76,7 +76,7 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
     return (
       <section className="mx-auto max-w-5xl px-3 sm:px-4 py-12">
         <h1 className="text-4xl font-bold">Dashboard admin achats</h1>
-        <p className="mt-2 text-[#b8c1cd]">Acces reserve aux administrateurs.</p>
+        <p className="mt-2 text-ink-muted">Acces reserve aux administrateurs.</p>
       </section>
     );
   }
@@ -242,37 +242,37 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-12">
       <h1 className="text-4xl font-bold">Dashboard admin achats</h1>
-      <p className="mt-2 text-[#b8c1cd]">Suivi des achats, CA par coach et commissions.</p>
+      <p className="mt-2 text-ink-muted">Suivi des achats, CA par coach et commissions.</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Achats (hors rembourses/litiges)</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">Achats (hors rembourses/litiges)</p>
           <p className="mt-2 text-3xl font-bold">{totalPurchasesClean}</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Chiffre d&apos;affaires</p>
-          <p className="mt-2 text-3xl font-bold text-[#e2e8f0]">{totalRevenueEur} EUR</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">Chiffre d&apos;affaires</p>
+          <p className="mt-2 text-3xl font-bold text-ink-muted">{totalRevenueEur} EUR</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Commission plateforme</p>
-          <p className="mt-2 text-3xl font-bold text-[#e2e8f0]">{totalCommissionEur} EUR</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">Commission plateforme</p>
+          <p className="mt-2 text-3xl font-bold text-ink-muted">{totalCommissionEur} EUR</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
-          <p className="text-sm text-[#94a3b8]">Gain reel coachs (CA - commission)</p>
+        <div className="rounded-md border border-line bg-surface shadow-resting p-5">
+          <p className="text-sm text-ink-muted">Gain reel coachs (CA - commission)</p>
           <p className="mt-2 text-3xl font-bold">
             {totalCoachNetEur} EUR
           </p>
         </div>
       </div>
 
-      <form className="mt-6 grid gap-3 rounded-2xl border border-white/10 bg-[#12161b]/80 p-4 md:grid-cols-5 md:items-end">
-        <label htmlFor="sort" className="text-sm text-[#b8c1cd]">
+      <form className="mt-6 grid gap-3 rounded-md border border-line bg-surface shadow-resting p-4 md:grid-cols-5 md:items-end">
+        <label htmlFor="sort" className="text-sm text-ink-muted">
           Trier par
           <select
             id="sort"
             name="sort"
             defaultValue={sort}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-[#21262d] px-3 py-2 text-sm text-[#edf1f6] [&>option]:bg-[#161b22] [&>option]:text-[#edf1f6]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink [&>option]:bg-surface [&>option]:text-ink"
           >
             <option value="date_desc">Date (recent au plus ancien)</option>
             <option value="date_asc">Date (ancien au plus recent)</option>
@@ -281,13 +281,13 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
           </select>
         </label>
 
-        <label htmlFor="coachId" className="text-sm text-[#b8c1cd]">
+        <label htmlFor="coachId" className="text-sm text-ink-muted">
           Coach
           <select
             id="coachId"
             name="coachId"
             defaultValue={coachId}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-[#21262d] px-3 py-2 text-sm text-[#edf1f6] [&>option]:bg-[#161b22] [&>option]:text-[#edf1f6]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink [&>option]:bg-surface [&>option]:text-ink"
           >
             <option value="">Tous les coachs</option>
             {coaches.map((coach) => (
@@ -298,35 +298,35 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
           </select>
         </label>
 
-        <label htmlFor="month" className="text-sm text-[#b8c1cd]">
+        <label htmlFor="month" className="text-sm text-ink-muted">
           Mois
           <input
             id="month"
             name="month"
             type="month"
             defaultValue={month}
-            className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-[#edf1f6]"
+            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
           />
         </label>
 
         <input type="hidden" name="page" value="1" />
         <button
           type="submit"
-          className="rounded-full border border-white/20 bg-[#2d3540] px-4 py-2 text-sm font-semibold text-[#edf1f6] hover:bg-[#3a4452]"
+          className="rounded-full border border-line bg-surface-alt px-4 py-2 text-sm font-semibold text-ink hover:bg-line"
         >
           Appliquer
         </button>
         <Link
           href="/admin/achats"
-          className="inline-flex items-center justify-center rounded-full border border-white/20 px-4 py-2 text-sm text-[#cfd6df] hover:bg-white/10"
+          className="inline-flex items-center justify-center rounded-full border border-line px-4 py-2 text-sm text-ink-muted hover:bg-surface-alt"
         >
           Reinitialiser
         </Link>
       </form>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
+      <div className="mt-6 overflow-hidden rounded-md border border-line bg-surface shadow-resting">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/5 text-[#cbd3dd]">
+          <thead className="bg-surface-alt text-ink-muted">
             <tr>
               <th className="px-4 py-3">Coach</th>
               <th className="px-4 py-3">Ventes</th>
@@ -338,11 +338,11 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
           <tbody>
             {coachTotals.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-4 text-[#94a3b8]">Aucune vente sur ce filtre.</td>
+                <td colSpan={5} className="px-4 py-4 text-ink-muted">Aucune vente sur ce filtre.</td>
               </tr>
             ) : (
               coachTotals.map((row) => (
-                <tr key={row.coachName} className="border-t border-white/10">
+                <tr key={row.coachName} className="border-t border-line">
                   <td className="px-4 py-3">{row.coachName}</td>
                   <td className="px-4 py-3">{row.sales}</td>
                   <td className="px-4 py-3">{(row.gross / 100).toFixed(2)} EUR</td>
@@ -355,14 +355,14 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
         </table>
       </div>
 
-      <p className="mt-4 text-sm text-[#b8c1cd]">
+      <p className="mt-4 text-sm text-ink-muted">
         Page {page} sur {totalPages} ({purchases.length} achat(s) affiche(s), {totalPurchasesRaw} au total sur ce
         filtre)
       </p>
 
-      <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-[#12161b]/80">
+      <div className="mt-8 overflow-hidden rounded-md border border-line bg-surface shadow-resting">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-white/5 text-[#cbd3dd]">
+          <thead className="bg-surface-alt text-ink-muted">
             <tr>
               <th className="px-4 py-3">Date</th>
               <th className="px-4 py-3">Utilisateur</th>
@@ -388,13 +388,13 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
                   : computeCommissionAmounts(purchase.amount, bps);
 
               const status = purchase.refundedAt
-                ? { label: "Rembourse", className: "text-rose-300" }
+                ? { label: "Rembourse", className: "text-ink-muted" }
                 : purchase.disputedAt
-                  ? { label: "Litige en cours", className: "text-[#ff8c42]" }
-                  : { label: "Paye", className: "text-emerald-300" };
+                  ? { label: "Litige en cours", className: "text-danger" }
+                  : { label: "Paye", className: "text-success" };
 
               return (
-                <tr key={purchase.id} className="border-t border-white/10">
+                <tr key={purchase.id} className="border-t border-line">
                   <td className="px-4 py-3">{new Date(purchase.createdAt).toLocaleDateString("fr-FR")}</td>
                   <td className="px-4 py-3">{purchase.user.name}</td>
                   <td className="px-4 py-3">{purchase.user.email}</td>
@@ -417,8 +417,8 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
           href={buildPageHref(Math.max(1, page - 1), sort, coachId, month)}
           className={`rounded-full px-4 py-2 text-sm ${
             page <= 1
-              ? "pointer-events-none border border-white/10 text-[#64748b]"
-                : "border border-white/20 text-[#cfd6df] hover:bg-white/10"
+              ? "pointer-events-none border border-line text-ink-muted"
+                : "border border-line text-ink-muted hover:bg-surface-alt"
           }`}
         >
           Precedent
@@ -428,8 +428,8 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
           href={buildPageHref(Math.min(totalPages, page + 1), sort, coachId, month)}
           className={`rounded-full px-4 py-2 text-sm ${
             page >= totalPages
-              ? "pointer-events-none border border-white/10 text-[#64748b]"
-                : "border border-white/20 text-[#cfd6df] hover:bg-white/10"
+              ? "pointer-events-none border border-line text-ink-muted"
+                : "border border-line text-ink-muted hover:bg-surface-alt"
           }`}
         >
           Suivant

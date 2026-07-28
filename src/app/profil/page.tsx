@@ -11,10 +11,10 @@ export default async function ProfilPage() {
     return (
       <section className="mx-auto max-w-4xl px-3 sm:px-4 py-12">
         <h1 className="text-4xl font-bold">Profil</h1>
-        <p className="mt-2 text-[#b8c1cd]">Connecte-toi pour gerer ton profil.</p>
+        <p className="mt-2 text-ink-muted">Connecte-toi pour gerer ton profil.</p>
         <Link
           href="/login"
-          className="mt-6 inline-block rounded-full border border-white/20 bg-[#2d3540] px-5 py-2 font-semibold text-[#edf1f6] hover:bg-[#3a4452]"
+          className="mt-6 inline-block rounded-full bg-accent px-5 py-2 font-semibold text-white transition-colors hover:bg-accent-deep"
         >
           Se connecter
         </Link>
@@ -36,7 +36,7 @@ export default async function ProfilPage() {
     return (
       <section className="mx-auto max-w-4xl px-3 sm:px-4 py-12">
         <h1 className="text-4xl font-bold">Profil</h1>
-        <p className="mt-2 text-[#b8c1cd]">Utilisateur introuvable.</p>
+        <p className="mt-2 text-ink-muted">Utilisateur introuvable.</p>
       </section>
     );
   }
@@ -44,7 +44,7 @@ export default async function ProfilPage() {
   return (
     <section className="mx-auto max-w-7xl px-3 sm:px-4 py-12">
       <h1 className="text-4xl font-bold">Profil utilisateur</h1>
-      <p className="mt-2 text-[#b8c1cd]">Mets a jour tes informations et ton mot de passe.</p>
+      <p className="mt-2 text-ink-muted">Mets a jour tes informations et ton mot de passe.</p>
 
       <div className="mt-8">
         <ProfileSettingsForm

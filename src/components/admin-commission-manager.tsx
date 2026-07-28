@@ -107,9 +107,9 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
 
   return (
     <section className="mt-8 grid gap-6 lg:grid-cols-2">
-      <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
+      <div className="rounded-md border border-line bg-surface shadow-resting p-5">
         <h2 className="text-xl font-semibold">Commission par coach</h2>
-        <p className="mt-1 text-sm text-[#94a3b8]">Definis le pourcentage retenu par la plateforme.</p>
+        <p className="mt-1 text-sm text-ink-muted">Definis le pourcentage retenu par la plateforme.</p>
 
         <div className="mt-4 space-y-3">
           <select
@@ -120,7 +120,7 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
               const coach = coaches.find((item) => item.id === newCoachId);
               setCoachCommissionPercent((coach?.commissionBps ?? 3000) / 100);
             }}
-            className="w-full rounded-lg border border-white/20 bg-[#21262d] px-3 py-2 text-sm text-[#edf1f6] [&>option]:bg-[#161b22] [&>option]:text-[#edf1f6]"
+            className="w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink [&>option]:bg-surface [&>option]:text-ink"
           >
             {coaches.map((coach) => (
               <option key={coach.id} value={coach.id}>
@@ -129,7 +129,7 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
             ))}
           </select>
 
-          <label className="block text-sm text-[#b8c1cd]">
+          <label className="block text-sm text-ink-muted">
             Commission (%)
             <input
               type="number"
@@ -138,30 +138,30 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
               step="0.01"
               value={coachCommissionPercent}
               onChange={(event) => setCoachCommissionPercent(Number(event.target.value))}
-              className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6]"
+              className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink"
             />
           </label>
 
           {selectedCoach ? (
-            <p className="text-xs text-[#94a3b8]">Actuel: {bpsToPercent(selectedCoach.commissionBps)}</p>
+            <p className="text-xs text-ink-muted">Actuel: {bpsToPercent(selectedCoach.commissionBps)}</p>
           ) : null}
 
           <button
             type="button"
             onClick={updateCoachCommission}
             disabled={isCoachLoading || !coachId}
-            className="rounded-full border border-white/20 bg-[#2d3540] px-4 py-2 text-sm font-semibold text-[#edf1f6] hover:bg-[#3a4452] disabled:opacity-60"
+            className="rounded-full border border-line bg-surface-alt px-4 py-2 text-sm font-semibold text-ink hover:bg-line disabled:opacity-60"
           >
             {isCoachLoading ? "Enregistrement..." : "Enregistrer"}
           </button>
 
-          {coachMessage ? <p className="text-sm text-[#d7dde5]">{coachMessage}</p> : null}
+          {coachMessage ? <p className="text-sm text-ink-muted">{coachMessage}</p> : null}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-[#12161b]/80 p-5">
+      <div className="rounded-md border border-line bg-surface shadow-resting p-5">
         <h2 className="text-xl font-semibold">Commission par video</h2>
-        <p className="mt-1 text-sm text-[#94a3b8]">Override optionnel pour une video specifique.</p>
+        <p className="mt-1 text-sm text-ink-muted">Override optionnel pour une video specifique.</p>
 
         <div className="mt-4 space-y-3">
           <select
@@ -173,7 +173,7 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
               setClearOverride(video?.commissionBpsOverride === null);
               setVideoCommissionPercent((video?.commissionBpsOverride ?? 3000) / 100);
             }}
-            className="w-full rounded-lg border border-white/20 bg-[#21262d] px-3 py-2 text-sm text-[#edf1f6] [&>option]:bg-[#161b22] [&>option]:text-[#edf1f6]"
+            className="w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink [&>option]:bg-surface [&>option]:text-ink"
           >
             {videos.map((video) => (
               <option key={video.id} value={video.id}>
@@ -182,12 +182,12 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
             ))}
           </select>
 
-          <label className="flex items-center gap-2 text-sm text-[#b8c1cd]">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             <input type="checkbox" checked={clearOverride} onChange={(event) => setClearOverride(event.target.checked)} />
             Utiliser la commission par defaut du coach
           </label>
 
-          <label className="block text-sm text-[#b8c1cd]">
+          <label className="block text-sm text-ink-muted">
             Override commission (%)
             <input
               type="number"
@@ -197,24 +197,24 @@ export function AdminCommissionManager({ coaches, videos }: AdminCommissionManag
               value={videoCommissionPercent}
               onChange={(event) => setVideoCommissionPercent(Number(event.target.value))}
               disabled={clearOverride}
-              className="mt-1 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-[#edf1f6] disabled:opacity-50"
+              className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-ink disabled:opacity-50"
             />
           </label>
 
           {selectedVideo ? (
-            <p className="text-xs text-[#94a3b8]">Actuel: {bpsToPercent(selectedVideo.commissionBpsOverride)}</p>
+            <p className="text-xs text-ink-muted">Actuel: {bpsToPercent(selectedVideo.commissionBpsOverride)}</p>
           ) : null}
 
           <button
             type="button"
             onClick={updateVideoCommission}
             disabled={isVideoLoading || !videoId}
-            className="rounded-full border border-white/20 bg-[#2d3540] px-4 py-2 text-sm font-semibold text-[#edf1f6] hover:bg-[#3a4452] disabled:opacity-60"
+            className="rounded-full border border-line bg-surface-alt px-4 py-2 text-sm font-semibold text-ink hover:bg-line disabled:opacity-60"
           >
             {isVideoLoading ? "Enregistrement..." : "Enregistrer"}
           </button>
 
-          {videoMessage ? <p className="text-sm text-[#d7dde5]">{videoMessage}</p> : null}
+          {videoMessage ? <p className="text-sm text-ink-muted">{videoMessage}</p> : null}
         </div>
       </div>
     </section>

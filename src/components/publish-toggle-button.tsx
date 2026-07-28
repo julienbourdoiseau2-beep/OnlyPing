@@ -53,17 +53,17 @@ export function PublishToggleButton({ videoId, isPublished, canPublish }: Publis
         title={isBlockedByStripe ? "Configure ton compte de paiement avant de publier une video." : undefined}
         className={`rounded-full border px-3 py-1 text-xs font-semibold transition disabled:opacity-60 ${
           isPublished
-            ? "border-[#7c2d12] bg-[#b45309] text-white hover:bg-[#c26812]"
-            : "border-[#166534] bg-[#15803d] text-white hover:bg-[#1d9350]"
+            ? "border-accent-deep bg-accent-deep text-white hover:opacity-90"
+            : "border-success bg-success text-white hover:opacity-90"
         }`}
       >
         {isLoading ? "..." : isPublished ? "Depublier" : "Publier"}
       </button>
-      <p className="mt-1 text-[11px] text-[#b8c1cd]">Etat: {isPublished ? "En ligne" : "Brouillon"}</p>
+      <p className="mt-1 text-[11px] text-ink-muted">Etat: {isPublished ? "En ligne" : "Brouillon"}</p>
       {isBlockedByStripe ? (
-        <p className="mt-1 text-[11px] text-[#ff8c42]">Compte de paiement a configurer pour publier.</p>
+        <p className="mt-1 text-[11px] text-danger">Compte de paiement a configurer pour publier.</p>
       ) : null}
-      {error ? <p className="mt-1 text-xs text-[#ff6b6b]">{error}</p> : null}
+      {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
     </div>
   );
 }

@@ -114,40 +114,40 @@ export function CoachVideoSettingsForm({
   }
 
   return (
-    <details className="rounded-[10px] border border-[#30363d] bg-[#161b22] p-2">
-      <summary className="cursor-pointer text-xs font-semibold text-[#e6edf3]">
+    <details className="rounded-md border border-line bg-surface p-2">
+      <summary className="cursor-pointer text-xs font-semibold text-ink">
         Modifier la video ({toLevelLabel(level)})
       </summary>
 
       <form onSubmit={onSubmit} className="mt-3 space-y-2">
-        <label className="grid gap-1 text-[11px] text-[#8b949e]">
+        <label className="grid gap-1 text-[11px] text-ink-muted">
           <span>Titre</span>
           <input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             required
-            className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3]"
+            className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink"
           />
         </label>
 
-        <label className="grid gap-1 text-[11px] text-[#8b949e]">
+        <label className="grid gap-1 text-[11px] text-ink-muted">
           <span>Description</span>
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             required
             rows={3}
-            className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3]"
+            className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink"
           />
         </label>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <label className="grid gap-1 text-[11px] text-[#8b949e]">
+          <label className="grid gap-1 text-[11px] text-ink-muted">
             <span>Categorie</span>
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3]"
+              className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink"
             >
               {VIDEO_CATEGORY_VALUES.map((item) => (
                 <option key={item} value={item}>
@@ -157,12 +157,12 @@ export function CoachVideoSettingsForm({
             </select>
           </label>
 
-          <label className="grid gap-1 text-[11px] text-[#8b949e]">
+          <label className="grid gap-1 text-[11px] text-ink-muted">
             <span>Niveau</span>
             <select
               value={level}
               onChange={(event) => setLevel(event.target.value)}
-              className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3]"
+              className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink"
             >
               {VIDEO_LEVEL_VALUES.map((item) => (
                 <option key={item} value={item}>
@@ -174,7 +174,7 @@ export function CoachVideoSettingsForm({
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <label className="grid gap-1 text-[11px] text-[#8b949e]">
+          <label className="grid gap-1 text-[11px] text-ink-muted">
             <span>Duree (minutes)</span>
             <input
               value={durationMin}
@@ -182,11 +182,11 @@ export function CoachVideoSettingsForm({
               type="number"
               min={1}
               required
-              className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3]"
+              className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink"
             />
           </label>
 
-          <label className="grid gap-1 text-[11px] text-[#8b949e]">
+          <label className="grid gap-1 text-[11px] text-ink-muted">
             <span>Prix (EUR)</span>
             <input
               value={priceEuros}
@@ -195,36 +195,36 @@ export function CoachVideoSettingsForm({
               min={0}
               step="0.01"
               required
-              className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3]"
+              className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink"
             />
           </label>
         </div>
 
-        <p className="text-[11px] text-[#8b949e]">Commission du site: {(effectiveCommissionBps / 100).toFixed(2)}%</p>
+        <p className="text-[11px] text-ink-muted">Commission du site: {(effectiveCommissionBps / 100).toFixed(2)}%</p>
 
-        <label className="grid gap-1 text-[11px] text-[#8b949e]">
+        <label className="grid gap-1 text-[11px] text-ink-muted">
           <span>URL miniature</span>
           <input
             value={thumbnail}
             onChange={(event) => setThumbnail(event.target.value)}
-            className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3]"
+            className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink"
           />
         </label>
 
-        <label className="grid gap-1 text-[11px] text-[#8b949e]">
+        <label className="grid gap-1 text-[11px] text-ink-muted">
           <span>Fichier miniature</span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp,image/avif"
             onChange={(event) => setThumbnailFile(event.target.files?.[0] ?? null)}
-            className="w-full rounded-[8px] border border-[#30363d] bg-[#21262d] px-2 py-1.5 text-xs text-[#e6edf3] file:mr-2 file:rounded file:border-0 file:bg-[#30363d] file:px-2 file:py-1 file:text-[#e6edf3]"
+            className="w-full rounded-sm border border-line bg-surface-alt px-2 py-1.5 text-xs text-ink file:mr-2 file:rounded file:border-0 file:bg-line file:px-2 file:py-1 file:text-ink"
           />
         </label>
 
         {thumbnailPreview ? (
           <div>
-            <p className="mb-1 text-[11px] text-[#8b949e]">Apercu miniature</p>
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-[#30363d]">
+            <p className="mb-1 text-[11px] text-ink-muted">Apercu miniature</p>
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm border border-line">
               <Image
                 fill
                 src={thumbnailPreview}
@@ -240,13 +240,13 @@ export function CoachVideoSettingsForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-[8px] bg-[#f5c842] px-2 py-1.5 text-xs font-semibold text-[#0d1117] hover:bg-[#e6b83a] disabled:opacity-60"
+          className="w-full rounded-sm bg-accent px-2 py-1.5 text-xs font-semibold text-white hover:bg-accent-deep disabled:opacity-60"
         >
           {isLoading ? "Enregistrement..." : "Enregistrer les modifications"}
         </button>
 
-        {error ? <p className="text-[11px] text-[#ff6b6b]">{error}</p> : null}
-        {success ? <p className="text-[11px] text-[#b6f0c2]">{success}</p> : null}
+        {error ? <p className="text-[11px] text-danger">{error}</p> : null}
+        {success ? <p className="text-[11px] text-success">{success}</p> : null}
       </form>
     </details>
   );
