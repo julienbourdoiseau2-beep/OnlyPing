@@ -68,6 +68,25 @@ export function PurchasesFilterList({ purchases }: PurchasesFilterListProps) {
 
       <p className="mt-3 text-sm text-ink-muted">{filtered.length} video(s) trouvee(s)</p>
 
+      {filtered.length === 0 ? (
+        <div className="mt-5 flex flex-col items-center gap-3 rounded-md border border-dashed border-line bg-surface p-10 text-center">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-10 w-10 text-ink-faint">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={2} />
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+          </svg>
+          <p className="text-base font-semibold text-ink">Aucun achat ne correspond a cette recherche</p>
+          <button
+            type="button"
+            onClick={() => {
+              setQuery("");
+              setLevel("TOUS");
+            }}
+            className="mt-1 rounded-sm border border-line bg-surface-alt px-4 py-1.5 text-sm text-ink transition-colors hover:bg-line"
+          >
+            Reinitialiser les filtres
+          </button>
+        </div>
+      ) : (
       <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((purchase) => (
           <article key={purchase.id} className="rounded-md border border-line bg-surface p-5 shadow-resting">
@@ -94,6 +113,7 @@ export function PurchasesFilterList({ purchases }: PurchasesFilterListProps) {
           </article>
         ))}
       </div>
+      )}
     </div>
   );
 }

@@ -21,6 +21,9 @@ type CoachVideoSettingsFormProps = {
   initialPriceCents: number;
   initialThumbnail: string;
   effectiveCommissionBps: number;
+  /** "row": collapsed behind a summary, for a compact desktop table row.
+   *  "expanded": fields shown directly, for contexts already gated by a modal/sheet. */
+  variant?: "row" | "expanded";
 };
 
 export function CoachVideoSettingsForm({
@@ -32,7 +35,8 @@ export function CoachVideoSettingsForm({
   initialDurationMin,
   initialPriceCents,
   initialThumbnail,
-  effectiveCommissionBps
+  effectiveCommissionBps,
+  variant = "row"
 }: CoachVideoSettingsFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
@@ -114,12 +118,7 @@ export function CoachVideoSettingsForm({
     router.refresh();
   }
 
-  return (
-    <details className="rounded-md border border-line bg-surface p-2">
-      <summary className="cursor-pointer text-xs font-semibold text-ink">
-        Modifier la video ({toLevelLabel(level)})
-      </summary>
-
+  const formFields = (
       <form onSubmit={onSubmit} className="mt-3 space-y-2">
         <label className="grid gap-1 text-[11px] text-ink-muted">
           <span>Titre</span>
@@ -249,6 +248,33 @@ export function CoachVideoSettingsForm({
         {error ? <p className="text-[11px] text-danger">{error}</p> : null}
         {success ? <p className="text-[11px] text-success">{success}</p> : null}
       </form>
+  );
+
+  if (variant === "expanded") {
+    return (
+      <div className="rounded-md border border-line bg-surface p-2">
+        <p className="text-xs font-semibold text-ink">Modifier la video</p>
+        {formFields}
+      </div>
+    );
+  }
+
+  return (
+    <details className="group rounded-md border border-line bg-surface p-2">
+      <summary className="flex cursor-pointer items-center gap-1.5 rounded-sm px-1 py-1 text-xs font-semibold text-ink transition-colors hover:bg-surface-alt">
+        <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 shrink-0 text-ink-muted">
+          <path
+            d="M13.5 3.5l3 3-9 9H4.5v-3l9-9z"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        Modifier la video ({toLevelLabel(level)})
+      </summary>
+
+      {formFields}
     </details>
   );
 }

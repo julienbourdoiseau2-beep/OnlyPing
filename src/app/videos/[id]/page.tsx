@@ -170,7 +170,7 @@ export default async function VideoDetailsPage({ params, searchParams }: Params)
         ) : session?.user ? (
           <div className="md:col-span-2">
             <p className="mb-3 text-sm text-ink-muted">La lecture complete se debloque apres achat.</p>
-            <PurchaseButton videoId={video.id} />
+            <PurchaseButton videoId={video.id} videoTitle={video.title} priceCents={video.priceCents} />
           </div>
         ) : (
           <Link

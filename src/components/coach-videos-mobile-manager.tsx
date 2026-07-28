@@ -99,6 +99,7 @@ export function CoachVideosMobileManager({ videos, coachCommissionBps, canPublis
 
             <div className="mt-4 space-y-2">
               <CoachVideoSettingsForm
+                variant="expanded"
                 videoId={selectedVideo.id}
                 initialTitle={selectedVideo.title}
                 initialDescription={selectedVideo.description}

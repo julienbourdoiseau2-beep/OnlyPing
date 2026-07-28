@@ -1,3 +1,4 @@
+import { CatalogueFilters } from "@/components/catalogue-filters";
 import { VideoCard } from "@/components/video-card";
 import { prisma } from "@/lib/prisma";
 import { VIDEO_LEVEL_LABELS, VIDEO_LEVEL_VALUES } from "@/lib/video-taxonomy";
@@ -79,108 +80,63 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
         Choisis ta prochaine seance selon ton niveau et travaille avec les methodes des entraineurs.
       </p>
 
-      <form className="mt-6 grid gap-3 rounded-md border border-line bg-surface p-4 shadow-resting md:grid-cols-6 md:items-end">
-        <label className="text-sm text-ink-muted md:col-span-2">
-          Rechercher
-          <input
-            type="search"
-            name="q"
-            defaultValue={query}
-            placeholder="Titre de la video..."
-            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-          />
-        </label>
+      <CatalogueFilters
+        coaches={coaches.map((coach) => ({ value: coach.id, label: coach.name }))}
+        categories={categories}
+        levels={[
+          { value: "", label: "Tous les niveaux" },
+          ...VIDEO_LEVEL_VALUES.map((item) => ({ value: item, label: VIDEO_LEVEL_LABELS[item] }))
+        ]}
+        initialQuery={query}
+        initialCoachId={coachId}
+        initialCategory={category}
+        initialLevel={level}
+      />
 
-        <label className="text-sm text-ink-muted">
-          Entraineur
-          <select
-            name="coachId"
-            defaultValue={coachId}
-            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
+      {videos.length === 0 ? (
+        <div className="mt-8 flex flex-col items-center gap-3 rounded-md border border-dashed border-line bg-surface p-10 text-center">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="h-10 w-10 text-ink-faint"
           >
-            <option value="">Tous les entraineurs</option>
-            {coaches.map((coach) => (
-              <option key={coach.id} value={coach.id}>
-                {coach.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={2} />
+            <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
+          </svg>
+          <p className="text-base font-semibold text-ink">Aucune video ne correspond a ces filtres</p>
+          <p className="max-w-sm text-sm text-ink-muted">
+            Essaie d&apos;elargir ta recherche, de changer de categorie ou de niveau, ou reinitialise les filtres.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {videos.map((video) => {
+            const reviewCount = video.reviews.length;
+            const averageRating =
+              reviewCount > 0
+                ? video.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+                : null;
 
-        <label className="text-sm text-ink-muted">
-          Categorie
-          <select
-            name="category"
-            defaultValue={category}
-            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
-          >
-            {categories.map((item) => (
-              <option key={item.label} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="text-sm text-ink-muted">
-          Niveau
-          <select
-            name="level"
-            defaultValue={level}
-            className="mt-1 w-full rounded-sm border border-line bg-surface-alt px-3 py-2 text-sm text-ink"
-          >
-            <option value="">Tous les niveaux</option>
-            {VIDEO_LEVEL_VALUES.map((item) => (
-              <option key={item} value={item}>
-                {VIDEO_LEVEL_LABELS[item]}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          type="submit"
-          className="rounded-sm bg-accent px-5 py-2 font-semibold text-white transition-colors hover:bg-accent-deep"
-        >
-          Filtrer
-        </button>
-
-        <a
-          href="/catalogue"
-          className="inline-flex items-center justify-center rounded-sm border border-line bg-surface-alt px-5 py-2 text-sm font-medium text-ink transition-colors hover:bg-line"
-        >
-          Reinitialiser
-        </a>
-      </form>
-
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {videos.map((video) => {
-          const reviewCount = video.reviews.length;
-          const averageRating =
-            reviewCount > 0
-              ? video.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
-              : null;
-
-          return (
-            <VideoCard
-              key={video.id}
-              id={video.id}
-              title={video.title}
-              thumbnail={video.thumbnail}
-              category={video.category}
-              level={video.level}
-              durationMin={video.durationMin}
-              priceCents={video.priceCents}
-              averageRating={averageRating}
-              reviewCount={reviewCount}
-              coachName={video.coach.name}
-              coachAvatarUrl={video.coach.avatarUrl}
-            />
-          );
-        })}
-      </div>
-
-      {videos.length === 0 ? <p className="mt-6 text-sm text-ink-muted">Aucune video pour ces filtres.</p> : null}
+            return (
+              <VideoCard
+                key={video.id}
+                id={video.id}
+                title={video.title}
+                thumbnail={video.thumbnail}
+                category={video.category}
+                level={video.level}
+                durationMin={video.durationMin}
+                priceCents={video.priceCents}
+                averageRating={averageRating}
+                reviewCount={reviewCount}
+                coachName={video.coach.name}
+                coachAvatarUrl={video.coach.avatarUrl}
+              />
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

@@ -4,9 +4,11 @@ import { useState } from "react";
 
 type PurchaseButtonProps = {
   videoId: string;
+  videoTitle: string;
+  priceCents: number;
 };
 
-export function PurchaseButton({ videoId }: PurchaseButtonProps) {
+export function PurchaseButton({ videoId, videoTitle, priceCents }: PurchaseButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasConsented, setHasConsented] = useState(false);
@@ -45,6 +47,11 @@ export function PurchaseButton({ videoId }: PurchaseButtonProps) {
 
   return (
     <div>
+      <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface-alt px-3 py-2">
+        <p className="text-sm text-ink">{videoTitle}</p>
+        <p className="text-sm font-semibold text-accent">{(priceCents / 100).toFixed(2)} EUR</p>
+      </div>
+
       <label className="mt-6 flex items-start gap-2 text-xs text-ink-muted">
         <input
           type="checkbox"
