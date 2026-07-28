@@ -113,22 +113,68 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
   // mais sont exclus des totaux : cet argent n'est plus (ou pas encore) acquis.
   const cleanWhere = { ...where, refundedAt: null, disputedAt: null };
 
-  const coaches = await prisma.user.findMany({
-    where: { role: { in: ["COACH", "ADMIN"] } },
-    select: {
-      id: true,
-      name: true,
-      commissionBps: true
-    },
-    orderBy: { name: "asc" }
-  });
-
-  const [totalPurchasesRaw, totalPurchasesClean, revenueAggregateClean] = await Promise.all([
+  // Tout ce qui ne depend pas de la pagination (donc pas de totalPurchasesRaw)
+  // part en une seule vague parallele plutot qu'en aller-retours DB successifs.
+  const [
+    coaches,
+    totalPurchasesRaw,
+    totalPurchasesClean,
+    revenueAggregateClean,
+    videos,
+    cleanPurchasesForTotals
+  ] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: { in: ["COACH", "ADMIN"] } },
+      select: {
+        id: true,
+        name: true,
+        commissionBps: true
+      },
+      orderBy: { name: "asc" }
+    }),
     prisma.purchase.count({ where }),
     prisma.purchase.count({ where: cleanWhere }),
     prisma.purchase.aggregate({
       where: cleanWhere,
       _sum: { amount: true }
+    }),
+    prisma.video.findMany({
+      select: {
+        id: true,
+        title: true,
+        commissionBpsOverride: true,
+        coach: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" },
+      take: 200
+    }),
+    // Totaux calcules sur l'ensemble filtre (pas seulement la page affichee), net des
+    // remboursements/litiges.
+    prisma.purchase.findMany({
+      where: cleanWhere,
+      select: {
+        amount: true,
+        commissionAmount: true,
+        coachNetAmount: true,
+        commissionBpsAtPurchase: true,
+        createdAt: true,
+        video: {
+          select: {
+            commissionBpsOverride: true,
+            coach: {
+              select: {
+                id: true,
+                name: true,
+                commissionBps: true
+              }
+            }
+          }
+        }
+      }
     })
   ]);
 
@@ -160,46 +206,6 @@ export default async function AdminAchatsPage({ searchParams }: AdminAchatsPageP
     orderBy,
     skip,
     take: PAGE_SIZE
-  });
-
-  const videos = await prisma.video.findMany({
-    select: {
-      id: true,
-      title: true,
-      commissionBpsOverride: true,
-      coach: {
-        select: {
-          name: true
-        }
-      }
-    },
-    orderBy: { createdAt: "desc" },
-    take: 200
-  });
-
-  // Totaux calcules sur l'ensemble filtre (pas seulement la page affichee), net des
-  // remboursements/litiges.
-  const cleanPurchasesForTotals = await prisma.purchase.findMany({
-    where: cleanWhere,
-    select: {
-      amount: true,
-      commissionAmount: true,
-      coachNetAmount: true,
-      commissionBpsAtPurchase: true,
-      createdAt: true,
-      video: {
-        select: {
-          commissionBpsOverride: true,
-          coach: {
-            select: {
-              id: true,
-              name: true,
-              commissionBps: true
-            }
-          }
-        }
-      }
-    }
   });
 
   const coachTotalsMap = new Map<string, { coachName: string; gross: number; commission: number; net: number; sales: number }>();

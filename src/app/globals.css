@@ -72,6 +72,18 @@ h4 {
   font-family: var(--font-display), sans-serif;
 }
 
+/* Instant tactile feedback on click, independent of network latency: every
+   button presses down slightly the moment it's activated, before whatever
+   fetch/router.refresh() it triggers has a chance to resolve. */
+button:not(:disabled) {
+  transition: transform 100ms ease, background-color 150ms ease, opacity 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
 a {
   color: inherit;
   text-decoration: none;

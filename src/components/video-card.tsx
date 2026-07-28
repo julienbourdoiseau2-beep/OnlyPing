@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { isOptimizableImageUrl } from "@/lib/image-optimization";
 import { toLevelLabel } from "@/lib/video-taxonomy";
 
 type VideoCardProps = {
@@ -15,10 +16,6 @@ type VideoCardProps = {
   coachName: string;
   coachAvatarUrl?: string | null;
 };
-
-function shouldUseUnoptimizedImage(src: string) {
-  return !src.startsWith("/");
-}
 
 function categoryLabel(category: string) {
   if (category === "REVERS") {
@@ -50,7 +47,7 @@ export function VideoCard({ id, title, thumbnail, category, level, durationMin, 
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm">
           <Image
             fill
-            unoptimized={shouldUseUnoptimizedImage(thumbnail)}
+            unoptimized={!isOptimizableImageUrl(thumbnail)}
             src={thumbnail}
             alt={title}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -70,7 +67,7 @@ export function VideoCard({ id, title, thumbnail, category, level, durationMin, 
       <div className="mt-2 flex items-center gap-2 text-sm text-ink-muted">
         {coachAvatarUrl ? (
           <Image
-            unoptimized={shouldUseUnoptimizedImage(coachAvatarUrl)}
+            unoptimized={!isOptimizableImageUrl(coachAvatarUrl)}
             src={coachAvatarUrl}
             alt={coachName}
             width={24}

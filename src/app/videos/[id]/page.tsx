@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { isOptimizableImageUrl } from "@/lib/image-optimization";
 import { prisma } from "@/lib/prisma";
 import { toLevelLabel } from "@/lib/video-taxonomy";
 import { PaymentStatusBanner } from "@/components/payment-status-banner";
@@ -13,10 +14,6 @@ type Params = {
   params: { id: string };
   searchParams?: { payment?: string };
 };
-
-function shouldUseUnoptimizedImage(src: string) {
-  return !src.startsWith("/");
-}
 
 export default async function VideoDetailsPage({ params, searchParams }: Params) {
   const session = await getServerSession(authOptions);
@@ -93,7 +90,7 @@ export default async function VideoDetailsPage({ params, searchParams }: Params)
 
       {showThumbnail ? (
         <Image
-          unoptimized={shouldUseUnoptimizedImage(video.thumbnail)}
+          unoptimized={!isOptimizableImageUrl(video.thumbnail)}
           src={video.thumbnail}
           alt={video.title}
           width={1280}
@@ -140,7 +137,7 @@ export default async function VideoDetailsPage({ params, searchParams }: Params)
           <div className="mt-2 flex items-center gap-3">
             {video.coach.avatarUrl ? (
               <Image
-                unoptimized={shouldUseUnoptimizedImage(video.coach.avatarUrl)}
+                unoptimized={!isOptimizableImageUrl(video.coach.avatarUrl)}
                 src={video.coach.avatarUrl}
                 alt={video.coach.name}
                 width={48}
@@ -206,7 +203,7 @@ export default async function VideoDetailsPage({ params, searchParams }: Params)
                     <div className="flex items-center gap-3">
                       {review.user.avatarUrl ? (
                         <Image
-                          unoptimized={shouldUseUnoptimizedImage(review.user.avatarUrl)}
+                          unoptimized={!isOptimizableImageUrl(review.user.avatarUrl)}
                           src={review.user.avatarUrl}
                           alt={review.user.name}
                           width={40}

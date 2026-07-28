@@ -4,6 +4,7 @@ import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { isOptimizableImageUrl } from "@/lib/image-optimization";
 
 type ProfileSettingsFormProps = {
   initialName: string;
@@ -11,10 +12,6 @@ type ProfileSettingsFormProps = {
   initialAvatarUrl: string;
   role: string;
 };
-
-function shouldUseUnoptimizedImage(src: string) {
-  return !src.startsWith("/");
-}
 
 export function ProfileSettingsForm({ initialName, initialEmail, initialAvatarUrl, role }: ProfileSettingsFormProps) {
   const router = useRouter();
@@ -194,7 +191,7 @@ export function ProfileSettingsForm({ initialName, initialEmail, initialAvatarUr
 
         {avatarUrl ? (
           <Image
-            unoptimized={shouldUseUnoptimizedImage(avatarUrl)}
+            unoptimized={!isOptimizableImageUrl(avatarUrl)}
             src={avatarUrl}
             alt="Apercu photo profil"
             width={64}

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { isOptimizableImageUrl } from "@/lib/image-optimization";
 import {
   VIDEO_CATEGORY_VALUES,
   VIDEO_LEVEL_LABELS,
@@ -229,7 +230,7 @@ export function CoachVideoSettingsForm({
                 fill
                 src={thumbnailPreview}
                 alt="Apercu miniature"
-                unoptimized={!thumbnailPreview.startsWith("/")}
+                unoptimized={!isOptimizableImageUrl(thumbnailPreview)}
                 sizes="(max-width: 768px) 100vw, 480px"
                 className="object-cover"
               />
