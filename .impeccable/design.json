@@ -4,9 +4,9 @@
   "title": "Design System: OnlyPing",
   "extensions": {
     "colorMeta": {
-      "accent": { "role": "primary", "displayName": "Accent (Match Orange)", "canonical": "#E8672E", "tonalRamp": ["#3A1B0C", "#5C2C13", "#8A421D", "#B85427", "#D1551F", "#E8672E", "#FF7A3D", "#FFB38A"] },
-      "bg": { "role": "neutral", "displayName": "Bg", "canonical": "#F6F7FB", "tonalRamp": ["#0A0F1C", "#121A2B", "#1A2338", "#232D45", "#5B6478", "#8A93A6", "#E2E6EE", "#F6F7FB"] },
-      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "#FFFFFF", "tonalRamp": ["#121A2B", "#1A2338", "#232D45", "#5B6478", "#8A93A6", "#E2E6EE", "#EEF1F6", "#FFFFFF"] },
+      "accent": { "role": "primary", "displayName": "Accent (Terracotta)", "canonical": "#CE6A3E", "tonalRamp": ["#3A1B0C", "#5C2C13", "#8A421D", "#B0552E", "#CE6A3E", "#E08A5F", "#FF7A3D", "#FFB38A"] },
+      "bg": { "role": "neutral", "displayName": "Bg", "canonical": "#EEF0F5", "tonalRamp": ["#0A0F1C", "#121A2B", "#1A2338", "#232D45", "#5B6478", "#8A93A6", "#DDE1E9", "#EEF0F5"] },
+      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "#FBFBFD", "tonalRamp": ["#121A2B", "#1A2338", "#232D45", "#5B6478", "#8A93A6", "#DDE1E9", "#E9ECF2", "#FBFBFD"] },
       "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#10182B", "tonalRamp": ["#10182B", "#232D45", "#5B6478", "#8A93A6", "#B7BECB", "#DCE0E8", "#EEF1F6", "#EAF0FA"] },
       "success": { "role": "tertiary", "displayName": "Success", "canonical": "#1F9D55", "tonalRamp": ["#0F2A1E", "#16301F", "#1F9D55", "#34D399", "#6FE3B4", "#B7F3D8", "#E7F6ED", "#F3FBF7"] },
       "danger": { "role": "error", "displayName": "Danger", "canonical": "#DC2626", "tonalRamp": ["#3A1414", "#5C1717", "#991B1B", "#DC2626", "#F87171", "#FCA5A5", "#FDECEC", "#FEF4F4"] },

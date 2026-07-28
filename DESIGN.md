@@ -2,15 +2,15 @@
 name: OnlyPing
 description: Videos techniques de ping-pong vendues par des entraineurs verifies.
 colors:
-  bg: "#F6F7FB"
-  surface: "#FFFFFF"
-  surface-alt: "#EEF1F6"
-  line: "#E2E6EE"
+  bg: "#EEF0F5"
+  surface: "#FBFBFD"
+  surface-alt: "#E9ECF2"
+  line: "#DDE1E9"
   ink: "#10182B"
   ink-muted: "#5B6478"
   ink-faint: "#8A93A6"
-  accent: "#E8672E"
-  accent-deep: "#D1551F"
+  accent: "#CE6A3E"
+  accent-deep: "#B0552E"
   success: "#1F9D55"
   success-bg: "#E7F6ED"
   danger: "#DC2626"
@@ -81,13 +81,13 @@ That one color is a competition-ball orange: **Accent**. Everything else is quie
 Palette is neutral-first with a single warm accent; category tags use quiet, low-saturation tints rather than competing with the accent.
 
 ### Primary
-- **Accent** (`#E8672E`, dark theme `#FF7A3D`): the one saturated color. Price, primary buttons, active nav state, focus rings, selected filters. Deepens to **Accent, Deep** (`#D1551F`) on hover in both themes.
+- **Accent** (`#CE6A3E` light / `#FF7A3D` dark): the one saturated color, a muted terracotta in light (kept a notch darker/less neon so it doesn't glare against the light neutrals) and a brighter true orange in dark (needs the extra brightness to read against a dark surface). Price, primary buttons, active nav state, focus rings, selected filters. Deepens to **Accent, Deep** (`#B0552E` light / `#D1551F` dark) on hover.
 
 ### Neutral
-- **Bg** (`#F6F7FB` light / `#0A0F1C` dark): page background.
-- **Surface** (`#FFFFFF` light / `#121A2B` dark): cards, header, forms, panels.
-- **Surface, Alt** (`#EEF1F6` light / `#1A2338` dark): recessed fills — inputs, table headers, chip backgrounds' neutral base.
-- **Line** (`#E2E6EE` light / `#232D45` dark): all hairline borders and dividers.
+- **Bg** (`#EEF0F5` light / `#0A0F1C` dark): page background.
+- **Surface** (`#FBFBFD` light / `#121A2B` dark): cards, header, forms, panels. Deliberately not pure white — an off-white keeps `bg`/`surface` from collapsing into a single flat white field.
+- **Surface, Alt** (`#E9ECF2` light / `#1A2338` dark): recessed fills — inputs, table headers, chip backgrounds' neutral base.
+- **Line** (`#DDE1E9` light / `#232D45` dark): all hairline borders and dividers.
 - **Ink** (`#10182B` light / `#EAF0FA` dark): primary text and headings.
 - **Ink, Muted** (`#5B6478` light / `#93A0B8` dark): secondary text, meta, captions.
 - **Ink, Faint** (`#8A93A6` light / `#5E6A82` dark): placeholders, disabled, least important labels.
@@ -156,7 +156,7 @@ A deliberate departure from the previous flat/border-only system: surfaces now c
 
 ### Inputs / Fields
 - **Style:** `surface-alt` background, `line` border, `8px` radius, `ink` text, `ink-faint` placeholder.
-- **Focus:** border becomes `accent`, plus a subtle accent-tinted focus ring (`box-shadow: 0 0 0 3px rgba(232,103,46,0.15)`).
+- **Focus:** border becomes `accent`, plus a subtle accent-tinted focus ring (`box-shadow: 0 0 0 3px rgba(206,106,62,0.15)` in light).
 - **Error:** border and helper text switch to `danger`.
 
 ### Navigation
@@ -180,14 +180,14 @@ Implemented as CSS custom properties on `:root` (light values, default) overridd
 
 | Token | Light | Dark |
 |---|---|---|
-| `bg` | `#F6F7FB` | `#0A0F1C` |
-| `surface` | `#FFFFFF` | `#121A2B` |
-| `surface-alt` | `#EEF1F6` | `#1A2338` |
-| `line` | `#E2E6EE` | `#232D45` |
+| `bg` | `#EEF0F5` | `#0A0F1C` |
+| `surface` | `#FBFBFD` | `#121A2B` |
+| `surface-alt` | `#E9ECF2` | `#1A2338` |
+| `line` | `#DDE1E9` | `#232D45` |
 | `ink` | `#10182B` | `#EAF0FA` |
 | `ink-muted` | `#5B6478` | `#93A0B8` |
 | `ink-faint` | `#8A93A6` | `#5E6A82` |
-| `accent` / `accent-deep` | `#E8672E` / `#D1551F` | `#FF7A3D` / `#D1551F` |
+| `accent` / `accent-deep` | `#CE6A3E` / `#B0552E` | `#FF7A3D` / `#D1551F` |
 | `success` / `success-bg` | `#1F9D55` / `#E7F6ED` | `#34D399` / `#0F2A1E` |
 | `danger` / `danger-bg` | `#DC2626` / `#FDECEC` | `#F87171` / `#3A1414` |
 | `info` / `info-bg` | `#2563EB` / `#E7EEFC` | `#60A5FA` / `#16223D` |

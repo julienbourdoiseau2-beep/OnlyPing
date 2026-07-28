@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: 246 247 251;
-  --color-surface: 255 255 255;
-  --color-surface-alt: 238 241 246;
-  --color-line: 226 230 238;
+  --color-bg: 238 240 245;
+  --color-surface: 251 251 253;
+  --color-surface-alt: 233 236 242;
+  --color-line: 221 225 233;
   --color-ink: 16 24 43;
   --color-ink-muted: 91 100 120;
   --color-ink-faint: 138 147 166;
-  --color-accent: 232 103 46;
-  --color-accent-deep: 209 85 31;
+  --color-accent: 206 106 62;
+  --color-accent-deep: 176 85 46;
   --color-success: 31 157 85;
   --color-success-bg: 231 246 237;
   --color-danger: 220 38 38;
